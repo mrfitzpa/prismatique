@@ -1,0 +1,51 @@
+# Ignore backups.
+*~
+
+# Ignore select directories.
+__pycache__/
+.ipynb_checkpoints/
+input-files/
+output-files/
+notebooks/
+examples/prism-example/
+examples/stem-example/
+examples/hrtem-example/
+examples/data/
+
+# Ignore select files.
+scratch_param.txt
+_temp_scan_config_file.txt
+_requirements-doc.txt
+
+# Ignore .pyc files.
+*.pyc
+
+# Ignore backup files.
+\#*#
+*.bak
+
+# Ignore pip install build files.
+build/
+*.egg-info/
+*/_version.py
+
+# Ignore .h5 data files.
+*.h5
+
+# Ignore most .ipynb files.
+*.ipynb
+!analyzing_sim_params.ipynb
+!analyzing_potential_slice_generator_output.ipynb
+!analyzing_S_matrix_generator_output.ipynb
+!analyzing_prism_stem_sim_output.ipynb
+!analyzing_multislice_stem_sim_output.ipynb
+!analyzing_hrtem_sim_output.ipynb
+
+# Ignore .xyz files.
+*.xyz
+
+# Ignore temporary files.
+_temp_*
+
+# Ignore SLURM output files.
+slurm-*.out

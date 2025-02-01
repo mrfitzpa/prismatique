@@ -1,0 +1,16 @@
+[paths]
+source =
+    ../prismatique
+    */site-packages/prismatique
+
+[run]
+branch = true
+source =
+    prismatique
+    .
+omit =
+    */prismatique/version.py
+
+[report]
+show_missing = true
+precision = 2

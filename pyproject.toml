@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prismatique"
+dynamic = ["version"]
+description = """
+A wrapper to the Python library `pyprismatic`, which is a library for \
+simulating CBED, STEM, and HRTEM experiments using Multislice algorithms.
+"""
+readme = "README.md"
+authors = [
+    {name = "Matthew Fitzpatrick", email = "matthew.rc.fitzpatrick@gmail.com"}
+]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Natural Language :: English"
+]
+keywords = [
+    "hyperspy",
+    "multislice",
+    "CBED",
+    "STEM",
+    "HRTEM",
+    "GPU",
+    "prismatic",
+    "pyprismatic",
+    "microscopy",
+    "electron beam",
+    "electron probe"
+]
+dependencies = [
+    "embeam",
+    "pyprismatic"
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+tests = [
+    "pytest-cov"
+]
+examples = [
+    "jupyter",
+    "ipympl"
+]
+docs = [
+    "sphinx<7",
+    "sphinx_rtd_theme",
+    "sphinx-autodoc-typehints",
+    "numpydoc",
+    "docutils"
+]
+all = [
+    "prismatique[tests, examples, docs]"
+]
+
+[project.urls]
+Homepage = "https://mrfitzpa.github.io/prismatique"
+Repository = "https://github.com/mrfitzpa/prismatique"
+
+[tool.setuptools_scm]
+write_to = "prismatique/version.py"
+version_scheme = "post-release"
