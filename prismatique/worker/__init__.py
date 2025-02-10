@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to workers, i.e. GPU and CPU
 workers.
 
@@ -11,11 +24,6 @@ copying certain passages when convenient.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For validating objects.
 import czekitout.check
@@ -32,19 +40,6 @@ import prismatique.worker.gpu
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
-
-
-
 ##################################
 ## Define classes and functions ##
 ##################################
@@ -54,51 +49,72 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_cpu_params(ctor_params):
-    cpu_params = \
-        prismatique.worker.cpu._check_and_convert_cpu_params(ctor_params)
+def _check_and_convert_cpu_params(params):
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._check_and_convert_cpu_params
+    cpu_params = func_alias(params)
 
     return cpu_params
 
 
 
 def _pre_serialize_cpu_params(cpu_params):
-    serializable_rep = \
-        prismatique.worker.cpu._pre_serialize_cpu_params(cpu_params)
+    obj_to_pre_serialize = cpu_params
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._pre_serialize_cpu_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_cpu_params(serializable_rep):
-    cpu_params = \
-        prismatique.worker.cpu._de_pre_serialize_cpu_params(serializable_rep)
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._de_pre_serialize_cpu_params
+    cpu_params = func_alias(serializable_rep)
 
     return cpu_params
 
 
 
-def _check_and_convert_gpu_params(ctor_params):
-    gpu_params = \
-        prismatique.worker.gpu._check_and_convert_gpu_params(ctor_params)
+def _check_and_convert_gpu_params(params):
+    module_alias = prismatique.worker.gpu
+    func_alias = module_alias._check_and_convert_gpu_params
+    gpu_params = func_alias(params)
 
     return gpu_params
 
 
 
 def _pre_serialize_gpu_params(gpu_params):
-    serializable_rep = \
-        prismatique.worker.gpu._pre_serialize_gpu_params(gpu_params)
+    obj_to_pre_serialize = gpu_params
+    module_alias = prismatique.worker.gpu
+    func_alias = module_alias._pre_serialize_gpu_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_gpu_params(serializable_rep):
-    gpu_params = \
-        prismatique.worker.gpu._de_pre_serialize_gpu_params(serializable_rep)
+    module_alias = prismatique.worker.gpu
+    func_alias = module_alias._de_pre_serialize_gpu_params
+    gpu_params = func_alias(serializable_rep)
 
     return gpu_params
+
+
+
+_module_alias_1 = \
+    prismatique.worker.cpu
+_module_alias_2 = \
+    prismatique.worker.gpu
+_default_cpu_params = \
+    _module_alias_1._default_cpu_params
+_default_gpu_params = \
+    _module_alias_2._default_gpu_params
+_default_skip_validation_and_conversion = \
+    _module_alias_1._default_skip_validation_and_conversion
 
 
 
@@ -148,62 +164,132 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         The simulation parameters related to GPU workers. If ``gpu`` is set to
         `None` [i.e. the default value], then the simulation parameters related
         to GPU workers are set to default values.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"cpu_params": _check_and_convert_cpu_params,
-         "gpu_params": _check_and_convert_gpu_params}
+    ctor_param_names = ("cpu_params",
+                        "gpu_params")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
 
-    _pre_serialization_funcs = \
-        {"cpu_params": _pre_serialize_cpu_params,
-         "gpu_params": _pre_serialize_gpu_params}
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _de_pre_serialization_funcs = \
-        {"cpu_params": _de_pre_serialize_cpu_params,
-         "gpu_params": _de_pre_serialize_gpu_params}
+    del ctor_param_names, kwargs
+
     
-    def __init__(self, cpu_params=None, gpu_params=None):
-        ctor_params = {"cpu_params": cpu_params, "gpu_params": gpu_params}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+
+    def __init__(self,
+                 cpu_params=\
+                 _default_cpu_params,
+                 gpu_params=\
+                 _default_gpu_params,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_worker_params(ctor_params):
-    worker_params = copy.deepcopy(ctor_params["worker_params"])
-    if worker_params is None:
-        worker_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": worker_params,
-              "obj_name": "worker_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_worker_params(params):
+    obj_name = "worker_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        worker_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        worker_params = accepted_types[0](**kwargs)
 
     return worker_params
 
 
 
 def _pre_serialize_worker_params(worker_params):
-    serializable_rep = worker_params.pre_serialize()
-
+    obj_to_pre_serialize = worker_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_worker_params(serializable_rep):
     worker_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return worker_params
+
+
+
+_default_worker_params = None
 
 
 

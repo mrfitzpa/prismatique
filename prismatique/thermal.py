@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to the thermal properties of 
 the sample and its environment.
 
@@ -12,11 +25,6 @@ copying certain passages when convenient.
 ## Load libraries/packages/modules ##
 #####################################
 
-# For performing deep copies of objects.
-import copy
-
-
-
 # For validating and converting objects.
 import czekitout.check
 import czekitout.convert
@@ -27,16 +35,8 @@ import fancytypes
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.worker.cpu
 
 
 
@@ -49,18 +49,19 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_enable_thermal_effects(ctor_params):
-    kwargs = {"obj": ctor_params["enable_thermal_effects"],
-              "obj_name": "enable_thermal_effects"}
+def _check_and_convert_enable_thermal_effects(params):
+    obj_name = "enable_thermal_effects"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     enable_thermal_effects = czekitout.convert.to_bool(**kwargs)
-    
+
     return enable_thermal_effects
 
 
 
 def _pre_serialize_enable_thermal_effects(enable_thermal_effects):
-    serializable_rep = enable_thermal_effects
-
+    obj_to_pre_serialize = enable_thermal_effects
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -72,20 +73,23 @@ def _de_pre_serialize_enable_thermal_effects(serializable_rep):
 
 
 
-def _check_and_convert_num_frozen_phonon_configs_per_subset(ctor_params):
-    kwargs = {"obj": ctor_params["num_frozen_phonon_configs_per_subset"],
-              "obj_name": "num_frozen_phonon_configs_per_subset"}
+def _check_and_convert_num_frozen_phonon_configs_per_subset(params):
+    obj_name = \
+        "num_frozen_phonon_configs_per_subset"
+    kwargs = \
+        {"obj": params[obj_name], "obj_name": obj_name}
     num_frozen_phonon_configs_per_subset = \
         czekitout.convert.to_positive_int(**kwargs)
-    
+
     return num_frozen_phonon_configs_per_subset
 
 
 
 def _pre_serialize_num_frozen_phonon_configs_per_subset(
         num_frozen_phonon_configs_per_subset):
-    serializable_rep = num_frozen_phonon_configs_per_subset
-
+    obj_to_pre_serialize = num_frozen_phonon_configs_per_subset
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -97,18 +101,19 @@ def _de_pre_serialize_num_frozen_phonon_configs_per_subset(serializable_rep):
 
 
 
-def _check_and_convert_num_subsets(ctor_params):
-    kwargs = {"obj": ctor_params["num_subsets"],
-              "obj_name": "num_subsets"}
+def _check_and_convert_num_subsets(params):
+    obj_name = "num_subsets"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     num_subsets = czekitout.convert.to_positive_int(**kwargs)
-    
+
     return num_subsets
 
 
 
 def _pre_serialize_num_subsets(num_subsets):
-    serializable_rep = num_subsets
-
+    obj_to_pre_serialize = num_subsets
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -120,27 +125,30 @@ def _de_pre_serialize_num_subsets(serializable_rep):
 
 
 
-def _check_and_convert_rng_seed(ctor_params):
-    rng_seed = ctor_params["rng_seed"]
-    try:
-        if rng_seed is not None:
-            kwargs = {"obj": rng_seed,
-                      "obj_name": "rng_seed"}
-            rng_seed = czekitout.convert.to_nonnegative_int(**kwargs)
-    except TypeError:
-        raise TypeError(_check_and_convert_rng_seed_err_msg_1)
-    except ValueError:
-        raise ValueError(_check_and_convert_rng_seed_err_msg_1)
-    except BaseException as err:
-        raise err
+def _check_and_convert_rng_seed(params):
+    obj_name = "rng_seed"
+    obj = params[obj_name]
+
+    current_func_name = "_check_and_convert_rng_seed"
     
+    if obj is not None:
+        kwargs = {"obj": obj, "obj_name": obj_name}
+        try:
+            rng_seed = czekitout.convert.to_nonnegative_int(**kwargs)
+        except:
+            err_msg = globals()[current_func_name+"_err_msg_1"]
+            raise TypeError(err_msg)
+    else:
+        rng_seed = obj
+
     return rng_seed
 
 
 
 def _pre_serialize_rng_seed(rng_seed):
-    serializable_rep = rng_seed
-
+    obj_to_pre_serialize = rng_seed
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -149,6 +157,21 @@ def _de_pre_serialize_rng_seed(serializable_rep):
     rng_seed = serializable_rep
 
     return rng_seed
+
+
+
+_module_alias = \
+    prismatique.worker.cpu
+_default_enable_thermal_effects = \
+    False
+_default_num_frozen_phonon_configs_per_subset = \
+    1
+_default_num_subsets = \
+    1
+_default_rng_seed = \
+    None
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -391,79 +414,138 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         A seed to pass to the random number generator used to sample the frozen
         phonon configurations. If set, ``rng_seed`` must be a non-negative 
         integer or `None`.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"enable_thermal_effects": _check_and_convert_enable_thermal_effects,
-         "num_frozen_phonon_configs_per_subset": \
-         _check_and_convert_num_frozen_phonon_configs_per_subset,
-         "num_subsets": _check_and_convert_num_subsets,
-         "rng_seed": _check_and_convert_rng_seed}
+    ctor_param_names = ("enable_thermal_effects",
+                        "num_frozen_phonon_configs_per_subset",
+                        "num_subsets",
+                        "rng_seed")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"enable_thermal_effects": _pre_serialize_enable_thermal_effects,
-         "num_frozen_phonon_configs_per_subset": \
-         _pre_serialize_num_frozen_phonon_configs_per_subset,
-         "num_subsets": _pre_serialize_num_subsets,
-         "rng_seed": _pre_serialize_rng_seed}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"enable_thermal_effects": _de_pre_serialize_enable_thermal_effects,
-         "num_frozen_phonon_configs_per_subset": \
-         _de_pre_serialize_num_frozen_phonon_configs_per_subset,
-         "num_subsets": _de_pre_serialize_num_subsets,
-         "rng_seed": _de_pre_serialize_rng_seed}
+    
     
     def __init__(self,
-                 enable_thermal_effects=False,
-                 num_frozen_phonon_configs_per_subset=1,
-                 num_subsets=1,
-                 rng_seed=None):
-        ctor_params = {"enable_thermal_effects": enable_thermal_effects,
-                       "num_frozen_phonon_configs_per_subset": \
-                       num_frozen_phonon_configs_per_subset,
-                       "num_subsets": num_subsets,
-                       "rng_seed": rng_seed}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 enable_thermal_effects=\
+                 _default_enable_thermal_effects,
+                 num_frozen_phonon_configs_per_subset=\
+                 _default_num_frozen_phonon_configs_per_subset,
+                 num_subsets=\
+                 _default_num_subsets,
+                 rng_seed=\
+                 _default_rng_seed,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_thermal_params(ctor_params):
-    thermal_params = copy.deepcopy(ctor_params["thermal_params"])
-    if thermal_params is None:
-        thermal_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": thermal_params,
-              "obj_name": "thermal_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_thermal_params(params):
+    obj_name = "thermal_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        thermal_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        thermal_params = accepted_types[0](**kwargs)
 
     return thermal_params
 
 
 
 def _pre_serialize_thermal_params(thermal_params):
-    serializable_rep = thermal_params.pre_serialize()
-
+    obj_to_pre_serialize = thermal_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_thermal_params(serializable_rep):
     thermal_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return thermal_params
+
+
+
+_default_thermal_params = None
     
 
 
@@ -472,5 +554,5 @@ def _de_pre_serialize_thermal_params(serializable_rep):
 ###########################
 
 _check_and_convert_rng_seed_err_msg_1 = \
-    ("The object ``rng_seed`` must be a nonnegative integer or of type "
-     "`NoneType`.")
+    ("The object ``rng_seed`` must be either a nonnegative integer or of the "
+     "type `NoneType`.")

@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to GPU workers.
 
 Note that the documentation in this module draws from Refs. [Pryor1]_ and
@@ -10,11 +23,6 @@ Note that the documentation in this module draws from Refs. [Pryor1]_ and
 ## Load libraries/packages/modules ##
 #####################################
 
-# For performing deep copies of objects.
-import copy
-
-
-
 # For validating and converting objects.
 import czekitout.check
 import czekitout.convert
@@ -25,16 +33,8 @@ import fancytypes
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.worker.cpu
 
 
 
@@ -47,18 +47,19 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_num_gpus(ctor_params):
-    kwargs = {"obj": ctor_params["num_gpus"],
-              "obj_name": "num_gpus"}
+def _check_and_convert_num_gpus(params):
+    obj_name = "num_gpus"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     num_gpus = czekitout.convert.to_nonnegative_int(**kwargs)
-    
+
     return num_gpus
 
 
 
 def _pre_serialize_num_gpus(num_gpus):
-    serializable_rep = num_gpus
-
+    obj_to_pre_serialize = num_gpus
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -70,47 +71,53 @@ def _de_pre_serialize_num_gpus(serializable_rep):
 
 
 
-def _check_and_convert_batch_size(ctor_params):
-    kwargs = {"obj": ctor_params["batch_size"],
-              "obj_name": "batch_size"}
-    batch_size = czekitout.convert.to_positive_int(**kwargs)
-    
+def _check_and_convert_batch_size(params):
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._check_and_convert_batch_size
+    batch_size = func_alias(params)
+
     return batch_size
 
 
 
 def _pre_serialize_batch_size(batch_size):
-    serializable_rep = batch_size
+    obj_to_pre_serialize = batch_size
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._pre_serialize_batch_size
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_batch_size(serializable_rep):
-    batch_size = serializable_rep
+    module_alias = prismatique.worker.cpu
+    func_alias = module_alias._de_pre_serialize_batch_size
+    batch_size = func_alias(serializable_rep)
 
     return batch_size
 
 
 
 def _check_and_convert_data_transfer_mode(ctor_params):
-    try:
-        kwargs = {"obj": ctor_params["data_transfer_mode"],
-                  "obj_name": "data_transfer_mode"}
-        data_transfer_mode = czekitout.convert.to_str_from_str_like(**kwargs)
-    except:
-        raise TypeError(_check_and_convert_data_transfer_mode_err_msg_1)
+    obj_name = "data_transfer_mode"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
+    obj = czekitout.convert.to_str_from_str_like(**kwargs)
 
-    accepted_values = ("single-transfer", "streaming", "auto")
-    if data_transfer_mode not in accepted_values:
-        raise ValueError(_check_and_convert_data_transfer_mode_err_msg_1)
+    kwargs = {"obj": obj,
+              "obj_name": obj_name,
+              "accepted_strings": ("single-transfer", "streaming", "auto")}
+    czekitout.check.if_one_of_any_accepted_strings(**kwargs)
+
+    data_transfer_mode = obj
     
     return data_transfer_mode
 
 
 
 def _pre_serialize_data_transfer_mode(data_transfer_mode):
-    serializable_rep = data_transfer_mode
+    obj_to_pre_serialize = early_stop_count
+    serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
 
@@ -123,18 +130,19 @@ def _de_pre_serialize_data_transfer_mode(serializable_rep):
 
 
 
-def _check_and_convert_num_streams_per_gpu(ctor_params):
-    kwargs = {"obj": ctor_params["num_streams_per_gpu"],
-              "obj_name": "num_streams_per_gpu"}
+def _check_and_convert_num_streams_per_gpu(params):
+    obj_name = "num_streams_per_gpu"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     num_streams_per_gpu = czekitout.convert.to_positive_int(**kwargs)
-    
+
     return num_streams_per_gpu
 
 
 
 def _pre_serialize_num_streams_per_gpu(num_streams_per_gpu):
-    serializable_rep = num_streams_per_gpu
-
+    obj_to_pre_serialize = num_streams_per_gpu
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -143,6 +151,21 @@ def _de_pre_serialize_num_streams_per_gpu(serializable_rep):
     num_streams_per_gpu = serializable_rep
 
     return num_streams_per_gpu
+
+
+
+_module_alias = \
+    prismatique.worker.cpu
+_default_num_gpus = \
+    4
+_default_batch_size = \
+    _module_alias._default_batch_size
+_default_data_transfer_mode = \
+    "auto"
+_default_num_streams_per_gpu = \
+    3
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -229,82 +252,141 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         of CUDA streams per GPU device. If ``num_gpus`` has been set to ``0`` or
         streaming mode has not been enabled, then the parameter 
         ``num_streams_per_gpu`` is ignored upon configuring the simulation. 
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"num_gpus": _check_and_convert_num_gpus,
-         "batch_size": _check_and_convert_batch_size,
-         "data_transfer_mode": _check_and_convert_data_transfer_mode,
-         "num_streams_per_gpu": _check_and_convert_num_streams_per_gpu}
+    ctor_param_names = ("enable_workers",
+                        "num_worker_threads",
+                        "batch_size",
+                        "early_stop_count")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"num_gpus": _pre_serialize_num_gpus,
-         "batch_size": _pre_serialize_batch_size,
-         "data_transfer_mode": _pre_serialize_data_transfer_mode,
-         "num_streams_per_gpu": _pre_serialize_num_streams_per_gpu}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"num_gpus": _de_pre_serialize_num_gpus,
-         "batch_size": _de_pre_serialize_batch_size,
-         "data_transfer_mode": _de_pre_serialize_data_transfer_mode,
-         "num_streams_per_gpu": _de_pre_serialize_num_streams_per_gpu}
+    
     
     def __init__(self,
-                 num_gpus=4,
-                 batch_size=1,
-                 data_transfer_mode="auto",
-                 num_streams_per_gpu=3):
-        ctor_params = {"num_gpus": num_gpus,
-                       "batch_size": batch_size,
-                       "data_transfer_mode": data_transfer_mode,
-                       "num_streams_per_gpu": num_streams_per_gpu}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 num_gpus=\
+                 _default_num_gpus,
+                 batch_size=\
+                 _default_batch_size,
+                 data_transfer_mode=\
+                 _default_data_transfor_mode,
+                 num_streams_per_gpu=\
+                 _default_num_streams_per_gpu,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_gpu_params(ctor_params):
-    gpu_params = copy.deepcopy(ctor_params["gpu_params"])
-    if gpu_params is None:
-        gpu_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": gpu_params,
-              "obj_name": "gpu_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_gpu_params(params):
+    obj_name = "gpu_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        gpu_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        gpu_params = accepted_types[0](**kwargs)
 
     return gpu_params
 
 
 
 def _pre_serialize_gpu_params(gpu_params):
-    serializable_rep = gpu_params.pre_serialize()
-
+    obj_to_pre_serialize = gpu_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_gpu_params(serializable_rep):
     gpu_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return gpu_params
+
+
+
+_default_gpu_params = None
     
 
 
 ###########################
 ## Define error messages ##
 ###########################
-
-_check_and_convert_data_transfer_mode_err_msg_1 = \
-    ("The object ``data_transfer_mode`` must be one of three strings: "
-     "``'single-transfer'``, ``'streaming'``, or ``'auto'``.")

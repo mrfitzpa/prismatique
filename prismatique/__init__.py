@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 """``prismatique`` is a Python library that functions essentially as a wrapper
 to the Python library ``pyprismatic``, which itself is a thin wrapper to
 ``prismatic``, a CUDA/C++ package for fast image simulations in scanning
@@ -14,7 +27,6 @@ microscopy. You can find more information about ``pyprismatic`` and
 #####################################
 
 # Import child modules and packages of current package.
-# import prismatique.sim
 import prismatique.worker
 import prismatique.thermal
 import prismatique.discretization
@@ -26,31 +38,9 @@ import prismatique.cbed
 import prismatique.stem
 import prismatique.hrtem
 import prismatique.load
-import prismatique.version
 
-
-
-############################
-## Authorship information ##
-############################
-
-__author__       = "Matthew Fitzpatrick"
-__copyright__    = "Copyright 2023"
-__credits__      = ["Matthew Fitzpatrick"]
-__version__      = prismatique.version.version
-__full_version__ = prismatique.version.full_version
-__maintainer__   = "Matthew Fitzpatrick"
-__email__        = "mrfitzpa@uvic.ca"
-__status__       = "Development"
-
-
-
-###################################
-## Useful background information ##
-###################################
-
-# See e.g. ``https://docs.python.org/3/reference/import.html#regular-packages``
-# for a brief discussion of ``__init__.py`` files.
+# Get version of current package.
+from prismatique.version import __version__
 
 
 
@@ -59,15 +49,10 @@ __status__       = "Development"
 ##################################
 
 # List of public objects in package.
-__all__ = ["show_config"]
+__all__ = []
 
 
 
-def show_config():
-    r"""Print information about the version of ``prismatique`` and libraries it 
-    uses.
-
-    """
-    print(version.version_summary)
-
-    return None
+###########################
+## Define error messages ##
+###########################

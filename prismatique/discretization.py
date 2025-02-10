@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to the discretization of 
 real-space and Fourier/:math:`k`-space.
 """
@@ -7,11 +20,6 @@ real-space and Fourier/:math:`k`-space.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For validating and converting objects.
 import czekitout.check
@@ -23,16 +31,8 @@ import fancytypes
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.worker.cpu
 
 
 
@@ -45,18 +45,19 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_z_supersampling(ctor_params):
-    kwargs = {"obj": ctor_params["z_supersampling"],
-              "obj_name": "z_supersampling"}
+def _check_and_convert_z_supersampling(params):
+    obj_name = "z_supersampling"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     z_supersampling = czekitout.convert.to_nonnegative_int(**kwargs)
-    
+
     return z_supersampling
 
 
 
 def _pre_serialize_z_supersampling(z_supersampling):
-    serializable_rep = z_supersampling
-
+    obj_to_pre_serialize = z_supersampling
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -68,20 +69,23 @@ def _de_pre_serialize_z_supersampling(serializable_rep):
 
 
 
-def _check_and_convert_sample_supercell_reduced_xy_dims_in_pixels(ctor_params):
-    kwargs = {"obj": ctor_params["sample_supercell_reduced_xy_dims_in_pixels"],
-              "obj_name": "sample_supercell_reduced_xy_dims_in_pixels"}
+def _check_and_convert_sample_supercell_reduced_xy_dims_in_pixels(params):
+    obj_name = \
+        "sample_supercell_reduced_xy_dims_in_pixels"
+    kwargs = \
+        {"obj": params[obj_name], "obj_name": obj_name}
     sample_supercell_reduced_xy_dims_in_pixels = \
         czekitout.convert.to_pair_of_positive_ints(**kwargs)
-    
+
     return sample_supercell_reduced_xy_dims_in_pixels
 
 
 
 def _pre_serialize_sample_supercell_reduced_xy_dims_in_pixels(
         sample_supercell_reduced_xy_dims_in_pixels):
-    serializable_rep = sample_supercell_reduced_xy_dims_in_pixels
-
+    obj_to_pre_serialize = sample_supercell_reduced_xy_dims_in_pixels
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -94,18 +98,19 @@ def _de_pre_serialize_sample_supercell_reduced_xy_dims_in_pixels(
 
 
 
-def _check_and_convert_interpolation_factors(ctor_params):
-    kwargs = {"obj": ctor_params["interpolation_factors"],
-              "obj_name": "interpolation_factors"}
+def _check_and_convert_interpolation_factors(params):
+    obj_name = "interpolation_factors"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     interpolation_factors = czekitout.convert.to_pair_of_positive_ints(**kwargs)
-    
+
     return interpolation_factors
 
 
 
 def _pre_serialize_interpolation_factors(interpolation_factors):
-    serializable_rep = interpolation_factors
-
+    obj_to_pre_serialize = interpolation_factors
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -117,18 +122,19 @@ def _de_pre_serialize_interpolation_factors(serializable_rep):
 
 
 
-def _check_and_convert_num_slices(ctor_params):
-    kwargs = {"obj": ctor_params["num_slices"],
-              "obj_name": "num_slices"}
+def _check_and_convert_num_slices(params):
+    obj_name = "num_slices"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     num_slices = czekitout.convert.to_positive_int(**kwargs)
-    
+
     return num_slices
 
 
 
 def _pre_serialize_num_slices(num_slices):
-    serializable_rep = num_slices
-
+    obj_to_pre_serialize = num_slices
+    serializable_rep = obj_to_pre_serialize
+    
     return serializable_rep
 
 
@@ -138,6 +144,20 @@ def _de_pre_serialize_num_slices(serializable_rep):
 
     return num_slices
 
+
+
+_module_alias = \
+    prismatique.worker.cpu
+_default_z_supersampling = \
+    16
+_default_sample_supercell_reduced_xy_dims_in_pixels = \
+    (64, 64)
+_default_interpolation_factors = \
+    (1, 1)
+_default_num_slices = \
+    25
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -330,79 +350,137 @@ class Params(fancytypes.PreSerializableAndUpdatable):
     num_slices : `int`, optional
         The number of slices :math:`N_{\text{slices}}` used to partition the 
         sample.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"z_supersampling": _check_and_convert_z_supersampling,
-         "sample_supercell_reduced_xy_dims_in_pixels": \
-         _check_and_convert_sample_supercell_reduced_xy_dims_in_pixels,
-         "interpolation_factors": _check_and_convert_interpolation_factors,
-         "num_slices": _check_and_convert_num_slices}
+    ctor_param_names = ("enable_workers",
+                        "num_worker_threads",
+                        "batch_size",
+                        "early_stop_count")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"z_supersampling": _pre_serialize_z_supersampling,
-         "sample_supercell_reduced_xy_dims_in_pixels": \
-         _pre_serialize_sample_supercell_reduced_xy_dims_in_pixels,
-         "interpolation_factors": _pre_serialize_interpolation_factors,
-         "num_slices": _pre_serialize_num_slices}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"z_supersampling": _de_pre_serialize_z_supersampling,
-         "sample_supercell_reduced_xy_dims_in_pixels": \
-         _de_pre_serialize_sample_supercell_reduced_xy_dims_in_pixels,
-         "interpolation_factors": _de_pre_serialize_interpolation_factors,
-         "num_slices": _de_pre_serialize_num_slices}
+    
     
     def __init__(self,
-                 z_supersampling=16,
-                 sample_supercell_reduced_xy_dims_in_pixels=(64, 64),
-                 interpolation_factors=(1, 1),
-                 num_slices=25):
-        ctor_params = {"z_supersampling": z_supersampling,
-                       "sample_supercell_reduced_xy_dims_in_pixels": \
-                       sample_supercell_reduced_xy_dims_in_pixels,
-                       "interpolation_factors": interpolation_factors,
-                       "num_slices": num_slices}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 z_supersampling=\
+                 _default_z_supersampling,
+                 sample_supercell_reduced_xy_dims_in_pixels=\
+                 _default_sample_supercell_reduced_xy_dims_in_pixels,
+                 interpolation_factors=\
+                 _default_interpolation_factors,
+                 num_slices=\
+                 _default_num_slices,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_discretization_params(ctor_params):
-    discretization_params = copy.deepcopy(ctor_params["discretization_params"])
-    if discretization_params is None:
-        discretization_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": discretization_params,
-              "obj_name": "discretization_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+def _check_and_convert_discretization_params(params):
+    obj_name = "discretization_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        discretization_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        discretization_params = accepted_types[0](**kwargs)
 
     return discretization_params
 
 
 
 def _pre_serialize_discretization_params(discretization_params):
-    serializable_rep = discretization_params.pre_serialize()
-
+    obj_to_pre_serialize = discretization_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_discretization_params(serializable_rep):
     discretization_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return discretization_params
+
+
+
+_default_discretization_params = None
     
 
 

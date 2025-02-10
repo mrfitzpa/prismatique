@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters and calculating quantities related to
 probe scan patterns.
 
@@ -24,9 +37,6 @@ import numpy as np
 import czekitout.check
 import czekitout.convert
 
-# To make directories.
-import h5pywrappers.obj
-
 # For checking whether floats are approximately zero.
 import emconstants
 
@@ -43,18 +53,8 @@ import prismatique.scan.rectangular
 # determining the dimensions of sample supercells.
 import prismatique.sample
 
-
-
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.cbed
 
 
 
@@ -69,9 +69,87 @@ __all__ = ["generate_probe_positions",
 
 
 
+def _check_and_convert_sample_specification(params):
+    module_alias = prismatique.cbed
+    func_alias = module_alias._check_and_convert_sample_specification
+    sample_specification = func_alias(params)
+
+    return sample_specification
+
+
+
+def _check_and_convert_scan_config(params):
+    obj_name = "scan_config"
+
+    current_func_name = "_check_and_convert_scan_config"
+
+    try:
+        kwargs = \
+            {"obj": params[obj_name], "obj_name": obj_name}
+        scan_config = \
+            czekitout.convert.to_real_two_column_numpy_matrix(**kwargs)
+    except:
+        try:
+            scan_config = \
+                czekitout.convert.to_str_from_path_like(**kwargs)
+        except:
+            try:
+                params = \
+                    {"rectangular_scan_params": params["scan_config"]}
+                mod_alias = \
+                    prismatique.scan.rectangular
+                func_alias = \
+                    mod_alias._check_and_convert_rectangular_scan_params
+                scan_config = \
+                    func_alias(params)
+
+                del params["rectangular_scan_params"]
+            except:
+                del params["rectangular_scan_params"]
+                err_msg = globals()[current_func_name+"_err_msg_1"]
+                raise TypeError(err_msg)
+    
+    return scan_config
+
+
+
+def _check_and_convert_filename(params):
+    obj_name = "filename"
+    obj = params[obj_name]
+
+    try:
+        kwargs = {"obj": obj, "obj_name": obj_name}
+        filename = czekitout.convert.to_str_from_path_like(**kwargs)
+    except:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": (str, type(None))}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        filename = obj
+
+    return filename
+
+
+
+_module_alias = \
+    prismatique.cbed
+_default_scan_config = \
+    None
+_default_filename = \
+    None
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
+
+
+
 def generate_probe_positions(sample_specification,
-                             scan_config=None,
-                             filename=None):
+                             scan_config=\
+                             _default_scan_config,
+                             filename=\
+                             _default_filename,
+                             skip_validation_and_conversion=\
+                             _default_skip_validation_and_conversion):
     r"""Generate the probe positions specified by a given scanning configuration
     for a given sample.
 
@@ -140,6 +218,15 @@ def generate_probe_positions(sample_specification,
         position, in units of angstroms; and the last line in the file is "-1".
         Otherwise, if ``filename`` is set to `None` [i.e. the default value],
         then the generated probe positions are not saved to file.
+    skip_validation_and_conversion : `bool`, optional
+        If ``skip_validation_and_conversion`` is set to ``False``, then
+        validations and conversions are performed on the above
+        parameters. 
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``, no
+        validations and conversions are performed on the above parameters. This
+        option is desired primarily when the user wants to avoid potentially
+        expensive validation and/or conversion operations.
 
     Returns
     -------
@@ -150,49 +237,25 @@ def generate_probe_positions(sample_specification,
         units of Å, where ``0<=i<num_positions``.
 
     """
-    accepted_types = (prismatique.sample.ModelParams,
-                      prismatique.sample.PotentialSliceSubsetIDs,
-                      prismatique.sample.SMatrixSubsetIDs,
-                      prismatique.sample.PotentialSliceAndSMatrixSubsetIDs)
-    prismatique.sample._check_sample_specification(sample_specification,
-                                                   accepted_types)
+    params = locals()
 
-    temp_ctor_params = {"scan_config": scan_config}
-    scan_config = _check_and_convert_scan_config(temp_ctor_params)
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
 
-    probe_positions = _generate_probe_positions(sample_specification,
-                                                scan_config,
-                                                filename)
-        
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
+
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    probe_positions = _generate_probe_positions(**kwargs)
+
     return probe_positions
-
-
-
-def _check_and_convert_scan_config(ctor_params):
-    # To be used in the module :mod:`prismatique.stem.system` as well, hence the
-    # function signature.
-    try:
-        kwargs = {"obj": ctor_params["scan_config"],
-                  "obj_name": "scan_config"}
-        scan_config = \
-            czekitout.convert.to_real_two_column_numpy_matrix(**kwargs)
-    except:
-        try:
-            scan_config = czekitout.convert.to_str_from_path_like(**kwargs)
-        except:
-            try:
-                temp_ctor_params = \
-                    {"rectangular_scan_params": ctor_params["scan_config"]}
-                mod_alias = \
-                    prismatique.scan.rectangular
-                check_and_convert_rectangular_scan_params = \
-                    mod_alias._check_and_convert_rectangular_scan_params
-                scan_config = \
-                    check_and_convert_rectangular_scan_params(temp_ctor_params)
-            except:
-                raise TypeError(_check_and_convert_scan_config_err_msg_1)
-    
-    return scan_config
 
 
 
@@ -203,11 +266,11 @@ def _generate_probe_positions(sample_specification, scan_config, filename):
         _check_scan_config_file_format(scan_config)
         probe_positions = _load_probe_positions(scan_config)
     elif isinstance(scan_config, prismatique.scan.rectangular.Params):
-        kwargs = \
-            {"rectangular_scan_params": scan_config,
-             "sample_specification": sample_specification}
-        probe_positions = \
-            prismatique.scan.rectangular._generate_probe_positions(**kwargs)
+        module_alias = prismatique.scan
+        func_alias = module_alias.rectangular._generate_probe_positions
+        kwargs = {"rectangular_scan_params": scan_config,
+                  "sample_specification": sample_specification}
+        probe_positions = func_alias(**kwargs)
     else:
         probe_positions = scan_config
 
@@ -231,11 +294,13 @@ def _check_scan_config_file_format(scan_config):
     except BaseException as err:
         raise err
 
+    current_func_name = "_check_scan_config_file_format"
+
     if ((lines[-1] != b"_1\n")
         and (lines[-1] != b"_1\r\n")
         and (lines[-1] != b"-1")):
-        err_msg = \
-            _check_scan_config_file_format_err_msg_1.format(input_filename)
+        unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
+        err_msg = unformatted_err_msg.format(input_filename)
         raise IOError(err_msg)
 
     for count, line in enumerate(lines[:-1]):
@@ -243,8 +308,8 @@ def _check_scan_config_file_format(scan_config):
             x, y = tuple(float(elem) for elem in line.split())
         except:
             line_num = count + 2
-            _check_scan_config_file_format_err_msg_2.format(line_num,
-                                                            input_filename)
+            unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
+            err_msg = unformatted_err_msg.format(line_num, input_filename)
             raise IOError(err_msg)
 
     return None
@@ -252,14 +317,18 @@ def _check_scan_config_file_format(scan_config):
 
 
 def _pre_load(input_filename):
+    current_func_name = "_pre_load"
+
     try:
         if not pathlib.Path(input_filename).is_file():
             raise FileNotFoundError
     except FileNotFoundError:
-        err_msg = h5pywrappers.obj._pre_load_err_msg_1.format(input_filename)
+        unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
+        err_msg = unformatted_err_msg.format(input_filename)
         raise FileNotFoundError(err_msg)
     except PermissionError:
-        err_msg = h5pywrappers.obj._pre_load_err_msg_2.format(input_filename)
+        unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
+        err_msg = unformatted_err_msg.format(input_filename)
         raise PermissionError(err_msg)
     except BaseException as err:
         raise err
@@ -307,10 +376,9 @@ def _save_probe_positions(probe_positions,
 
 
 def _pre_save(output_filename):
-    output_filename = czekitout.convert.to_str_from_path_like(output_filename,
-                                                              "filename")
-    temp_dir_path, rm_temp_dir = \
-        h5pywrappers.obj._mk_parent_dir(output_filename)
+    temp_dir_path, rm_temp_dir = _mk_parent_dir(filename=output_filename)
+
+    current_func_name = "_pre_save"
 
     try:
         if not pathlib.Path(output_filename).is_file():
@@ -318,8 +386,8 @@ def _pre_save(output_filename):
                 with open(output_filename, "w") as file_obj:
                     pass
             except PermissionError:
-                err_msg = \
-                    h5pywrappers.obj._pre_save_err_msg_1.format(output_filename)
+                unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
+                err_msg = unformatted_err_msg.format(output_filename)
                 raise PermissionError(err_msg)
             except BaseException as err:
                 raise err
@@ -330,8 +398,8 @@ def _pre_save(output_filename):
                 with open(output_filename, "a") as file_obj:
                     pass
             except PermissionError:
-                err_msg = \
-                    h5pywrappers.obj._pre_save_err_msg_2.format(output_filename)
+                unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
+                err_msg = unformatted_err_msg.format(output_filename)
                 raise PermissionError(err_msg)
             except BaseException as err:
                 raise err
@@ -344,6 +412,34 @@ def _pre_save(output_filename):
         shutil.rmtree(temp_dir_path)
 
     return None
+
+
+
+def _mk_parent_dir(filename):
+    current_func_name = "_mk_parent_dir"
+
+    try:
+        parent_dir_path = pathlib.Path(filename).resolve().parent
+        temp_dir_path = pathlib.Path(parent_dir_path.root)
+
+        parent_dir_did_not_already_exist = False
+
+        for path_part in parent_dir_path.parts[1:]:
+            temp_dir_path = pathlib.Path.joinpath(temp_dir_path, path_part)
+            if not temp_dir_path.is_dir():
+                parent_dir_did_not_already_exist = True
+                break
+
+        pathlib.Path(parent_dir_path).mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        err_msg = globals()[current_func_name+"_err_msg_1"].format(filename)
+        raise PermissionError(err_msg)
+
+    first_new_dir_made = (temp_dir_path
+                          if parent_dir_did_not_already_exist
+                          else None)
+
+    return first_new_dir_made
 
 
 
@@ -547,3 +643,18 @@ _check_scan_config_file_format_err_msg_2 = \
      "specified by the object ``scan_config``) is not formatted correctly: it "
      "should be of the form 'x y', where 'x' and 'y' are floating-point "
      "numbers.")
+
+_pre_load_err_msg_1 = \
+    ("No file exists at the file path ``'{}'``.")
+_pre_load_err_msg_2 = \
+    ("Cannot access the file path ``'{}'`` because of insufficient "
+     "permissions.")
+
+_pre_save_err_msg_1 = \
+    _pre_load_err_msg_2
+_pre_save_err_msg_2 = \
+    ("Cannot write to the file at the file path ``'{}'`` because of "
+     "insufficient permissions.")
+
+_mk_parent_dir_err_msg_1 = \
+    _pre_load_err_msg_2
