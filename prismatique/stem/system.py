@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to the modelling of STEM
 systems.
 
@@ -9,11 +22,6 @@ systems.
 ## Load libraries/packages/modules ##
 #####################################
 
-# For performing deep copies of objects.
-import copy
-
-
-
 # For validating and converting objects.
 import czekitout.check
 import czekitout.convert
@@ -21,10 +29,6 @@ import czekitout.convert
 # For defining classes that support enforced validation, updatability,
 # pre-serialization, and de-serialization.
 import fancytypes
-
-# For validating, pre-serializing, and de-pre-serializing instances of the
-# class :class:`embeam.stem.probe.ModelParams`.
-import embeam.stem.probe
 
 
 
@@ -41,19 +45,6 @@ import prismatique.scan
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
-
-
-
 ##################################
 ## Define classes and functions ##
 ##################################
@@ -63,96 +54,71 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_sample_specification(ctor_params):
-    sample_specification = copy.deepcopy(ctor_params["sample_specification"])
+def _check_and_convert_sample_specification(params):
+    params["accepted_types"] = (prismatique.sample.ModelParams,
+                                prismatique.sample.PotentialSliceSubsetIDs,
+                                prismatique.sample.SMatrixSubsetIDs)
     
-    accepted_types = (prismatique.sample.ModelParams,
-                      prismatique.sample.PotentialSliceSubsetIDs,
-                      prismatique.sample.SMatrixSubsetIDs,
-                      prismatique.sample.PotentialSliceAndSMatrixSubsetIDs)
-    kwargs = {"obj": sample_specification,
-              "obj_name": "sample_specification",
-              "accepted_types": accepted_types}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
-    
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_sample_specification
+    sample_specification = func_alias(params)
+
+    del params["accepted_types"]
+
     return sample_specification
 
 
 
 def _pre_serialize_sample_specification(sample_specification):
-    mod_alias = prismatique.sample
-    if "thermal_params" in sample_specification.core_attrs:
-        pre_serialize_sample_specification = \
-            mod_alias._pre_serialize_sample_model_params
-    elif "interpolation_factors" in sample_specification.core_attrs:
-        pre_serialize_sample_specification = \
-            mod_alias._pre_serialize_potential_slice_subset_ids
-    elif "S_matrix_set_filenames" in sample_specification.core_attrs:
-        pre_serialize_sample_specification = \
-            mod_alias._pre_serialize_potential_slice_set_and_S_matrix_subset_ids
-    else:
-        pre_serialize_sample_specification = \
-            mod_alias._pre_serialize_S_matrix_subset_ids
-        
-    serializable_rep = pre_serialize_sample_specification(sample_specification)
-
+    obj_to_pre_serialize = sample_specification
+    module_alias = prismatique.sample
+    func_alias = module_alias._pre_serialize_sample_specification
+    serializable_rep = func_alias(obj_to_pre_serialize)
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_sample_specification(serializable_rep):
-    if "thermal_params" in serializable_rep:
-        de_pre_serialize_sample_specification = \
-            prismatique.sample._de_pre_serialize_sample_model_params
-    elif "interpolation_factors" in serializable_rep:
-        de_pre_serialize_sample_specification = \
-            prismatique.sample._de_pre_serialize_potential_slice_subset_ids
-    elif "S_matrix_set_filenames" in serializable_rep:
-        alias = prismatique.sample  # To maintain 80 character line width below.
-        de_pre_serialize_sample_specification = \
-            alias._de_pre_serialize_potential_slice_set_and_S_matrix_subset_ids
-    else:
-        de_pre_serialize_sample_specification = \
-            prismatique.sample._de_pre_serialize_S_matrix_subset_ids
-        
-    sample_specification = \
-        de_pre_serialize_sample_specification(serializable_rep)
+    module_alias = prismatique.sample
+    func_alias = module_alias._de_pre_serialize_sample_specification
+    sample_specification = func_alias(serializable_rep)
 
     return sample_specification
 
 
 
-def _check_and_convert_probe_model_params(ctor_params):
-    probe_model_params = \
-        embeam.stem.probe._check_and_convert_probe_model_params(ctor_params)
-    
+def _check_and_convert_probe_model_params(params):
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_probe_model_params
+    probe_model_params = func_alias(params)
+
     return probe_model_params
 
 
 
 def _pre_serialize_probe_model_params(probe_model_params):
-    pre_serialize_probe_model_params = \
-        embeam.stem.probe._pre_serialize_probe_model_params
-    serializable_rep = \
-        pre_serialize_probe_model_params(probe_model_params)
-
+    obj_to_pre_serialize = probe_model_params
+    module_alias = prismatique.sample
+    func_alias = module_alias._pre_serialize_probe_model_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_probe_model_params(serializable_rep):
-    de_pre_serialize_probe_model_params = \
-        embeam.stem.probe._de_pre_serialize_probe_model_params
-    probe_model_params = \
-        de_pre_serialize_probe_model_params(serializable_rep)
+    module_alias = prismatique.sample
+    func_alias = module_alias._de_pre_serialize_probe_model_params
+    probe_model_params = func_alias(serializable_rep)
 
     return probe_model_params
 
 
 
-def _check_and_convert_specimen_tilt(ctor_params):
-    kwargs = {"obj": ctor_params["specimen_tilt"],
-              "obj_name": "specimen_tilt"}
+def _check_and_convert_specimen_tilt(params):
+    obj_name = "specimen_tilt"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     specimen_tilt = czekitout.convert.to_pair_of_floats(**kwargs)
     
     return specimen_tilt
@@ -160,6 +126,7 @@ def _check_and_convert_specimen_tilt(ctor_params):
 
 
 def _pre_serialize_specimen_tilt(specimen_tilt):
+    obj_to_pre_serialize = specimen_tilt
     serializable_rep = specimen_tilt
 
     return serializable_rep
@@ -173,26 +140,26 @@ def _de_pre_serialize_specimen_tilt(serializable_rep):
 
 
 
-def _check_and_convert_scan_config(ctor_params):
-    scan_config = prismatique.scan._check_and_convert_scan_config(ctor_params)
+def _check_and_convert_scan_config(params):
+    module_alias = prismatique.scan
+    func_alias = module_alias._check_and_convert_scan_config
+    scan_config = func_alias(params)
     
     return scan_config
 
 
 
 def _pre_serialize_scan_config(scan_config):
-    if isinstance(scan_config, str):
-        serializable_rep = scan_config
-    elif isinstance(scan_config, prismatique.scan.rectangular.Params):
-        pre_serialize_rectangular_scan_params = \
-            prismatique.scan.rectangular._pre_serialize_rectangular_scan_params
-        serializable_rep = \
-            pre_serialize_rectangular_scan_params(scan_config)
+    obj_to_pre_serialize = scan_config
+    if isinstance(obj_to_pre_serialize, str):
+        serializable_rep = obj_to_pre_serialize
+    elif isinstance(obj_to_pre_serialize, prismatique.scan.rectangular.Params):
+        module_alias = prismatique.scan.rectangular
+        func_alias = module_alias._pre_serialize_rectangular_scan_params
+        kwargs = {"rectangular_scan_params": obj_to_pre_serialize}
+        serializable_rep = func_alias(**kwargs)
     else:
-        serializable_rep = scan_config.tolist()
-        for idx, row in enumerate(serializable_rep):
-            serializable_rep[idx] = tuple(row)
-        serializable_rep = tuple(serializable_rep)
+        serializable_rep = scan_config
 
     return serializable_rep
 
@@ -202,17 +169,30 @@ def _de_pre_serialize_scan_config(serializable_rep):
     if isinstance(serializable_rep, str):
         scan_config = serializable_rep
     elif isinstance(serializable_rep, dict):
-        mod_alias = prismatique.scan.rectangular
-        de_pre_serialize_rectangular_scan_params = \
-            mod_alias._de_pre_serialize_rectangular_scan_params
-        scan_config = de_pre_serialize_rectangular_scan_params(serializable_rep)
+        module_alias = prismatique.scan.rectangular
+        func_alias = module_alias._de_pre_serialize_rectangular_scan_params
+        scan_config = func_alias(serializable_rep)
     else:
-        kwargs = {"obj": serializable_rep,
-                  "obj_name": "serializable_rep"}
-        scan_config = \
-            czekitout.convert.to_real_two_column_numpy_matrix(**kwargs)
+        func_alias = czekitout.convert.to_real_two_column_numpy_matrix
+        kwargs = {"obj": serializable_rep, "obj_name": "serializable_rep"}
+        scan_config = func_alias(**kwargs)
 
     return scan_config
+
+
+
+_module_alias_1 = \
+    prismatique.sample
+_module_alias_2 = \
+    prismatique.scan
+_default_probe_model_params = \
+    _module_alias_1._default_probe_model_params
+_default_specimen_tilt = \
+    (0, 0)
+_default_scan_config = \
+    _module_alias_2._default_scan_config
+_default_skip_validation_and_conversion = \
+    _module_alias_2._default_skip_validation_and_conversion
 
 
 
@@ -221,7 +201,7 @@ class ModelParams(fancytypes.PreSerializableAndUpdatable):
 
     Parameters
     ----------
-    sample_specification : :class:`prismatique.sample.ModelParams` | :class:`prismatique.sample.PotentialSliceSubsetIDs` | :class:`prismatique.sample.SMatrixSubsetIDs` | :class:`prismatique.sample.PotentialSliceAndSMatrixSubsetIDs`
+    sample_specification : :class:`prismatique.sample.ModelParams` | :class:`prismatique.sample.PotentialSliceSubsetIDs` | :class:`prismatique.sample.SMatrixSubsetIDs`
         The simulation parameters specifying the sample model. 
 
         If ``sample_specification`` is of the type
@@ -290,74 +270,152 @@ class ModelParams(fancytypes.PreSerializableAndUpdatable):
         is set to `None`, [i.e.  the default value], then the probe is to be
         scanned across the entire unit cell of the simulation, in steps of 0.25
         angstroms in both the :math:`x`- and :math:`y`-directions.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"sample_specification": _check_and_convert_sample_specification,
-         "probe_model_params": _check_and_convert_probe_model_params,
-         "specimen_tilt": _check_and_convert_specimen_tilt,
-         "scan_config": _check_and_convert_scan_config}
+    ctor_param_names = ("sample_specification",
+                        "probe_model_params",
+                        "specimen_tilt",
+                        "scan_config")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"sample_specification": _pre_serialize_sample_specification,
-         "probe_model_params": _pre_serialize_probe_model_params,
-         "specimen_tilt": _pre_serialize_specimen_tilt,
-         "scan_config": _pre_serialize_scan_config}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"sample_specification": _de_pre_serialize_sample_specification,
-         "probe_model_params": _de_pre_serialize_probe_model_params,
-         "specimen_tilt": _de_pre_serialize_specimen_tilt,
-         "scan_config": _de_pre_serialize_scan_config}
+    
     
     def __init__(self,
                  sample_specification,
-                 probe_model_params=None,
-                 specimen_tilt=(0, 0),
-                 scan_config=None):
-        ctor_params = {"sample_specification": sample_specification,
-                       "probe_model_params": probe_model_params,
-                       "specimen_tilt": specimen_tilt,
-                       "scan_config": scan_config}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 probe_model_params=\
+                 _default_probe_model_params,
+                 specimen_tilt=\
+                 _default_specimen_tilt,
+                 scan_config=\
+                 _default_scan_config,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_stem_system_model_params(ctor_params):
-    stem_system_model_params = \
-        copy.deepcopy(ctor_params["stem_system_model_params"])    
-    kwargs = {"obj": stem_system_model_params,
-              "obj_name": "stem_system_model_params",
-              "accepted_types": (ModelParams,)}
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
+    
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_stem_system_model_params(params):
+    obj_name = "stem_system_model_params"
+    obj = params[obj_name]
+
+    accepted_types = (ModelParams,)
+
+    kwargs = {"obj": obj,
+              "obj_name": obj_name,
+              "accepted_types": accepted_types}
     czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+    kwargs = obj.get_core_attrs(deep_copy=False)
+    stem_system_model_params = accepted_types[0](**kwargs)
+
+    if "worker_params" not in params:
+        stem_system_model_params_core_attrs = \
+            stem_system_model_params.get_core_attrs(deep_copy=False)
+
+        sample_specification = \
+            stem_system_model_params_core_attrs["sample_specification"]
+        probe_model_params = \
+            stem_system_model_params_core_attrs["probe_model_params"]
+        scan_config = \
+            stem_system_model_params_core_attrs["scan_config"]
+
+        kwargs = {"params": dict()}
+        kwargs["params"]["sample_specification"] = sample_specification
+        kwargs["params"]["probe_model_params"] = probe_model_params
+        _check_and_convert_probe_model_params(**kwargs)
+
+        kwargs = {"sample_specification": sample_specification,
+                  "scan_config": scan_config,
+                  "filename": None}
+        prismatique.scan._generate_probe_positions(**kwargs)
 
     return stem_system_model_params
 
 
 
 def _pre_serialize_stem_system_model_params(stem_system_model_params):
-    serializable_rep = stem_system_model_params.pre_serialize()
-
+    obj_to_pre_serialize = stem_system_model_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_stem_system_model_params(serializable_rep):
     stem_system_model_params = ModelParams.de_pre_serialize(serializable_rep)
-
-    return stem_system_model_params
     
+    return stem_system_model_params
+
 
 
 ###########################

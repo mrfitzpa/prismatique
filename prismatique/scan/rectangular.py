@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to rectangular grid-like probe
 scan patterns.
 
@@ -8,11 +21,6 @@ scan patterns.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For general array handling.
 import numpy as np
@@ -25,9 +33,6 @@ import czekitout.convert
 # pre-serialization, and de-serialization.
 import fancytypes
 
-# For checking whether two floating-point numbers are approximately equal.
-import emconstants
-
 
 
 # For validating, pre-serializing, and de-pre-serializing integers used as seeds
@@ -36,19 +41,6 @@ import prismatique.thermal
 
 # For determining the dimensions of sample supercells.
 import prismatique.sample
-
-
-
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
 
 
 
@@ -61,9 +53,9 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_step_size(ctor_params):
-    kwargs = {"obj": ctor_params["step_size"],
-              "obj_name": "step_size"}
+def _check_and_convert_step_size(params):
+    obj_name = "step_size"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     step_size = czekitout.convert.to_pair_of_positive_floats(**kwargs)
     
     return step_size
@@ -71,7 +63,8 @@ def _check_and_convert_step_size(ctor_params):
 
 
 def _pre_serialize_step_size(step_size):
-    serializable_rep = step_size
+    obj_to_pre_serialize = step_size
+    serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
 
@@ -84,41 +77,49 @@ def _de_pre_serialize_step_size(serializable_rep):
 
 
 
-def _check_and_convert_window(ctor_params):
+def _check_and_convert_window(params):
+    obj_name = "window"
+
+    current_func_name = "_check_and_convert_window"
+
     try:
-        kwargs = {"obj": ctor_params["window"],
-                  "obj_name": "window"}
+        kwargs = {"obj": params[obj_name], "obj_name": obj_name}
         window = czekitout.convert.to_tuple_of_floats(**kwargs)
 
         if len(window) != 4:
-            raise
-        
+            raise        
         if ((not (window[0] < window[1])) or (not (window[2] < window[3]))):
             raise
     except:
-        raise TypeError(_check_and_convert_window_err_msg_1)
+        err_msg = globals()[current_func_name+"_err_msg_1"]
+        raise TypeError(err_msg)
     
     return window
 
 
 
 def _pre_serialize_window(window):
-    serializable_rep = window
+    obj_to_pre_serialize = window
+    module_alias = prismatique.tilt
+    func_alias = module_alias._pre_serialize_window
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_window(serializable_rep):
-    window = serializable_rep
+    module_alias = prismatique.tilt
+    func_alias = module_alias._de_pre_serialize_window
+    window = func_alias(serializable_rep)
 
     return window
 
 
 
-def _check_and_convert_jitter(ctor_params):
-    kwargs = {"obj": ctor_params["jitter"],
-              "obj_name": "jitter"}
+def _check_and_convert_jitter(params):
+    obj_name = "jitter"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     jitter = czekitout.convert.to_nonnegative_float(**kwargs)
     
     return jitter
@@ -126,7 +127,8 @@ def _check_and_convert_jitter(ctor_params):
 
 
 def _pre_serialize_jitter(jitter):
-    serializable_rep = jitter
+    obj_to_pre_serialize = jitter
+    serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
 
@@ -139,24 +141,46 @@ def _de_pre_serialize_jitter(serializable_rep):
 
 
 
-def _check_and_convert_rng_seed(ctor_params):
-    rng_seed = prismatique.thermal._check_and_convert_rng_seed(ctor_params)
+def _check_and_convert_rng_seed(params):
+    module_alias = prismatique.thermal
+    func_alias = module_alias._check_and_convert_rng_seed
+    rng_seed = func_alias(params)
     
     return rng_seed
 
 
 
 def _pre_serialize_rng_seed(rng_seed):
-    serializable_rep = prismatique.thermal._pre_serialize_rng_seed(rng_seed)
+    obj_to_pre_serialize = rng_seed
+    module_alias = prismatique.thermal
+    func_alias = module_alias._pre_serialize_rng_seed
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_rng_seed(serializable_rep):
-    rng_seed = prismatique.thermal._de_pre_serialize_rng_seed(serializable_rep)
+    module_alias = prismatique.thermal
+    func_alias = module_alias._de_pre_serialize_rng_seed
+    rng_seed = func_alias(serializable_rep)
 
     return rng_seed
+
+
+
+_module_alias = \
+    prismatique.thermal
+_default_step_size = \
+    (0.25, 0.25)
+_default_window = \
+    (0, 1, 0, 1)
+_default_jitter = \
+    0
+_default_rng_seed = \
+    _module_alias._default_rng_seed
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -228,84 +252,145 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         A seed to pass to the random number generator used to sample the frozen
         phonon configurations. If set, ``rng_seed`` must be a non-negative 
         integer or `None`.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"step_size": _check_and_convert_step_size,
-         "window": _check_and_convert_window,
-         "jitter": _check_and_convert_jitter,
-         "rng_seed": _check_and_convert_rng_seed}
+    ctor_param_names = ("step_size",
+                        "window",
+                        "jitter",
+                        "rng_seed")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"step_size": _pre_serialize_step_size,
-         "window": _pre_serialize_window,
-         "jitter": _pre_serialize_jitter,
-         "rng_seed": _pre_serialize_rng_seed}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"step_size": _de_pre_serialize_step_size,
-         "window": _de_pre_serialize_window,
-         "jitter": _de_pre_serialize_jitter,
-         "rng_seed": _de_pre_serialize_rng_seed}
+    
     
     def __init__(self,
-                 step_size=(0.25, 0.25),
-                 window=(0, 1, 0, 1),
-                 jitter=0,
-                 rng_seed=None):
-        ctor_params = {"step_size": step_size,
-                       "window": window,
-                       "jitter": jitter,
-                       "rng_seed": rng_seed}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 step_size=\
+                 _default_step_size,
+                 window=\
+                 _default_window,
+                 jitter=\
+                 _default_jitter,
+                 rng_seed=\
+                 _default_rng_seed,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_rectangular_scan_params(ctor_params):
-    rectangular_scan_params = \
-        copy.deepcopy(ctor_params["rectangular_scan_params"])
-    if rectangular_scan_params is None:
-        rectangular_scan_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": rectangular_scan_params,
-              "obj_name": "rectangular_scan_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_rectangular_scan_params(params):
+    obj_name = "rectangular_scan_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        rectangular_scan_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        rectangular_scan_params = accepted_types[0](**kwargs)
 
     return rectangular_scan_params
 
 
 
 def _pre_serialize_rectangular_scan_params(rectangular_scan_params):
-    serializable_rep = rectangular_scan_params.pre_serialize()
-
+    obj_to_pre_serialize = rectangular_scan_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_rectangular_scan_params(serializable_rep):
     rectangular_scan_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return rectangular_scan_params
 
 
 
 def _generate_probe_positions(rectangular_scan_params, sample_specification):
-    step_size = rectangular_scan_params.core_attrs["step_size"]
-    window = rectangular_scan_params.core_attrs["window"]
-    jitter = rectangular_scan_params.core_attrs["jitter"]
-    rng_seed = rectangular_scan_params.core_attrs["rng_seed"]
+    rectangular_scan_params_core_attrs = \
+        rectangular_scan_params.get_core_attrs(deep_copy=False)
+
+    step_size = rectangular_scan_params_core_attrs["step_size"]
+    window = rectangular_scan_params_core_attrs["window"]
+    jitter = rectangular_scan_params_core_attrs["jitter"]
+    rng_seed = rectangular_scan_params_core_attrs["rng_seed"]
 
     Delta_X, Delta_Y, _ = \
         prismatique.sample._supercell_dims(sample_specification)
@@ -317,7 +402,7 @@ def _generate_probe_positions(rectangular_scan_params, sample_specification):
 
     x_probe_coord_step = step_size[0]
     y_probe_coord_step = step_size[1]
-    tol = emconstants.tol
+    tol = 1e-10
 
     x_coords = np.arange(min_x_probe_coord,
                          max_x_probe_coord+tol,
@@ -328,15 +413,14 @@ def _generate_probe_positions(rectangular_scan_params, sample_specification):
 
     np.random.seed(rng_seed)
 
-    probe_positions = []
+    probe_positions = tuple()
     for x_coord in x_coords:
         for y_coord in y_coords:
             dr = np.random.uniform(0, jitter*max(step_size))
             theta = np.random.uniform(0, 2*np.pi)
             dx = dr * np.cos(theta)
             dy = dr * np.sin(theta)
-            probe_positions.append((x_coord+dx, y_coord+dy))
-    probe_positions = tuple(probe_positions)
+            probe_positions += ((x_coord+dx, y_coord+dy),)
 
     np.random.seed()
 

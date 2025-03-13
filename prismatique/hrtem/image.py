@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to HRTEM image wavefunctions 
 and intensities.
 
@@ -8,11 +21,6 @@ and intensities.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For validating and converting objects.
 import czekitout.check
@@ -27,18 +35,9 @@ import fancytypes
 # For postprocessing HRTEM intensity images.
 import prismatique._signal
 
-
-
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.cbed
+import prismatique.sample
 
 
 
@@ -52,40 +51,39 @@ __all__ = ["Params",
 
 
 
-def _check_and_convert_postprocessing_seq(ctor_params):
-    check_and_convert_postprocessing_seq = \
-        prismatique._signal._check_and_convert_postprocessing_seq
-    postprocessing_seq = \
-        check_and_convert_postprocessing_seq(ctor_params)
-    
+def _check_and_convert_postprocessing_seq(params):
+    module_alias = prismatique.cbed
+    func_alias = module_alias._check_and_convert_postprocessing_seq
+    postprocessing_seq = func_alias(params)
+
     return postprocessing_seq
 
 
 
 def _pre_serialize_postprocessing_seq(postprocessing_seq):
-    pre_serialize_postprocessing_seq = \
-        prismatique._signal._pre_serialize_postprocessing_seq
-    serializable_rep = \
-        pre_serialize_postprocessing_seq(postprocessing_seq)
+    obj_to_pre_serialize = postprocessing_seq
+    module_alias = prismatique.cbed
+    func_alias = module_alias._pre_serialize_postprocessing_seq
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_postprocessing_seq(serializable_rep):
-    de_pre_serialize_postprocessing_seq = \
-        prismatique._signal._de_pre_serialize_postprocessing_seq
-    postprocessing_seq = \
-        de_pre_serialize_postprocessing_seq(serializable_rep)
+    module_alias = prismatique.cbed
+    func_alias = module_alias._de_pre_serialize_postprocessing_seq
+    postprocessing_seq = func_alias(serializable_rep)
 
     return postprocessing_seq
 
 
 
-def _check_and_convert_avg_num_electrons_per_postprocessed_image(ctor_params):
+def _check_and_convert_avg_num_electrons_per_postprocessed_image(params):
+    obj_name = \
+        "avg_num_electrons_per_postprocessed_image"
     kwargs = \
-        {"obj": ctor_params["avg_num_electrons_per_postprocessed_image"],
-         "obj_name": "avg_num_electrons_per_postprocessed_image"}
+        {"obj": params[obj_name], "obj_name": obj_name}
     avg_num_electrons_per_postprocessed_image = \
         czekitout.convert.to_positive_float(**kwargs)
     
@@ -95,7 +93,8 @@ def _check_and_convert_avg_num_electrons_per_postprocessed_image(ctor_params):
 
 def _pre_serialize_avg_num_electrons_per_postprocessed_image(
         avg_num_electrons_per_postprocessed_image):
-    serializable_rep = avg_num_electrons_per_postprocessed_image
+    obj_to_pre_serialize = avg_num_electrons_per_postprocessed_image
+    serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
 
@@ -109,73 +108,104 @@ def _de_pre_serialize_avg_num_electrons_per_postprocessed_image(
 
 
 
-def _check_and_convert_apply_shot_noise(ctor_params):
-    kwargs = {"obj": ctor_params["apply_shot_noise"],
-              "obj_name": "apply_shot_noise"}
-    apply_shot_noise = czekitout.convert.to_bool(**kwargs)
-    
+def _check_and_convert_apply_shot_noise(params):
+    module_alias = prismatique.cbed
+    func_alias = module_alias._check_and_convert_apply_shot_noise
+    apply_shot_noise = func_alias(params)
+
     return apply_shot_noise
 
 
 
 def _pre_serialize_apply_shot_noise(apply_shot_noise):
-    serializable_rep = apply_shot_noise
+    obj_to_pre_serialize = apply_shot_noise
+    module_alias = prismatique.cbed
+    func_alias = module_alias._pre_serialize_apply_shot_noise
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_apply_shot_noise(serializable_rep):
-    apply_shot_noise = serializable_rep
+    module_alias = prismatique.cbed
+    func_alias = module_alias._de_pre_serialize_apply_shot_noise
+    apply_shot_noise = func_alias(serializable_rep)
 
     return apply_shot_noise
 
 
 
-def _check_and_convert_save_wavefunctions(ctor_params):
-    kwargs = {"obj": ctor_params["save_wavefunctions"],
-              "obj_name": "save_wavefunctions"}
-    save_wavefunctions = czekitout.convert.to_bool(**kwargs)
-    
+def _check_and_convert_save_wavefunctions(params):
+    module_alias = prismatique.cbed
+    func_alias = module_alias._check_and_convert_save_wavefunctions
+    save_wavefunctions = func_alias(params)
+
     return save_wavefunctions
 
 
 
 def _pre_serialize_save_wavefunctions(save_wavefunctions):
-    serializable_rep = save_wavefunctions
+    obj_to_pre_serialize = save_wavefunctions
+    module_alias = prismatique.cbed
+    func_alias = module_alias._pre_serialize_save_wavefunctions
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_save_wavefunctions(serializable_rep):
-    save_wavefunctions = serializable_rep
+    module_alias = prismatique.cbed
+    func_alias = module_alias._de_pre_serialize_save_wavefunctions
+    save_wavefunctions = func_alias(serializable_rep)
 
     return save_wavefunctions
 
 
 
-def _check_and_convert_save_final_intensity(ctor_params):
-    kwargs = {"obj": ctor_params["save_final_intensity"],
-              "obj_name": "save_final_intensity"}
-    save_final_intensity = czekitout.convert.to_bool(**kwargs)
-    
+def _check_and_convert_save_final_intensity(params):
+    module_alias = prismatique.cbed
+    func_alias = module_alias._check_and_convert_save_final_intensity
+    save_final_intensity = func_alias(params)
+
     return save_final_intensity
 
 
 
-def _pre_serialize_save_final_intensity(
-        save_final_intensity):
-    serializable_rep = save_final_intensity
+def _pre_serialize_save_final_intensity(save_final_intensity):
+    obj_to_pre_serialize = save_final_intensity
+    module_alias = prismatique.cbed
+    func_alias = module_alias._pre_serialize_save_final_intensity
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_save_final_intensity(serializable_rep):
-    save_final_intensity = serializable_rep
+    module_alias = prismatique.cbed
+    func_alias = module_alias._de_pre_serialize_save_final_intensity
+    save_final_intensity = func_alias(serializable_rep)
 
     return save_final_intensity
+
+
+
+_module_alias = \
+    prismatique.cbed
+_default_postprocessing_seq = \
+    _module_alias._default_postprocessing_seq
+_default_avg_num_electrons_per_postprocessed_image = \
+    1
+_default_apply_shot_noise = \
+    _module_alias._default_apply_shot_noise
+_default_save_wavefunctions = \
+    _module_alias._default_save_wavefunctions
+_default_save_final_intensity = \
+    _module_alias._default_save_final_intensity
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -296,88 +326,170 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         HRTEM intensity image, obtained by performing the incoherent average
         described further above, is saved to a file with basename
         ``"hrtem_sim_intensity_output.h5"``. Otherwise, it is not saved.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"postprocessing_seq": _check_and_convert_postprocessing_seq,
-         "avg_num_electrons_per_postprocessed_image": \
-         _check_and_convert_avg_num_electrons_per_postprocessed_image,
-         "apply_shot_noise": _check_and_convert_apply_shot_noise,
-         "save_wavefunctions": _check_and_convert_save_wavefunctions,
-         "save_final_intensity": _check_and_convert_save_final_intensity}
+    ctor_param_names = ("postprocessing_seq",
+                        "avg_num_electrons_per_postprocessed_image",
+                        "apply_shot_noise",
+                        "save_wavefunctions",
+                        "save_final_intensity")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"postprocessing_seq": _pre_serialize_postprocessing_seq,
-         "avg_num_electrons_per_postprocessed_image": \
-         _pre_serialize_avg_num_electrons_per_postprocessed_image,
-         "apply_shot_noise": _pre_serialize_apply_shot_noise,
-         "save_wavefunctions": _pre_serialize_save_wavefunctions,
-         "save_final_intensity": _pre_serialize_save_final_intensity}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"postprocessing_seq": _de_pre_serialize_postprocessing_seq,
-         "avg_num_electrons_per_postprocessed_image": \
-         _de_pre_serialize_avg_num_electrons_per_postprocessed_image,
-         "apply_shot_noise": _de_pre_serialize_apply_shot_noise,
-         "save_wavefunctions": _de_pre_serialize_save_wavefunctions,
-         "save_final_intensity": _de_pre_serialize_save_final_intensity}
+    
     
     def __init__(self,
-                 postprocessing_seq=tuple(),
-                 avg_num_electrons_per_postprocessed_image=1,
-                 apply_shot_noise=False,
-                 save_wavefunctions=False,
-                 save_final_intensity=False):
-        ctor_params = {"postprocessing_seq": postprocessing_seq,
-                       "avg_num_electrons_per_postprocessed_image": \
-                       avg_num_electrons_per_postprocessed_image,
-                       "apply_shot_noise": apply_shot_noise,
-                       "save_wavefunctions": save_wavefunctions,
-                       "save_final_intensity": save_final_intensity}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 postprocessing_seq=\
+                 _default_postprocessing_seq,
+                 avg_num_electrons_per_postprocessed_image=\
+                 _default_avg_num_electrons_per_postprocessed_image,
+                 apply_shot_noise=\
+                 _default_apply_shot_noise,
+                 save_wavefunctions=\
+                 _default_save_wavefunctions,
+                 save_final_intensity=\
+                 _default_save_final_intensity,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_image_params(ctor_params):
-    image_params = copy.deepcopy(ctor_params["image_params"])
-    if image_params is None:
-        image_params = Params()
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
     
-    kwargs = {"obj": image_params,
-              "obj_name": "image_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_image_params(params):
+    obj_name = "image_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        image_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        image_params = accepted_types[0](**kwargs)
 
     return image_params
 
 
 
 def _pre_serialize_image_params(image_params):
-    serializable_rep = image_params.pre_serialize()
-
+    obj_to_pre_serialize = image_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_image_params(serializable_rep):
     image_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return image_params
 
 
 
-def blank_unprocessed_image_signal(sample_specification):
+_default_image_params = None
+
+
+
+def _check_and_convert_sample_specification(params):
+    params["accepted_types"] = (prismatique.sample.ModelParams,
+                                prismatique.sample.PotentialSliceSubsetIDs)
+
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_sample_specification
+    sample_specification = func_alias(params)
+
+    del params["accepted_types"]
+
+    return sample_specification
+
+
+
+def _check_and_convert_skip_validation_and_conversion(params):
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    return skip_validation_and_conversion
+
+
+
+def blank_unprocessed_image_signal(sample_specification,
+                                   skip_validation_and_conversion=\
+                                   _default_skip_validation_and_conversion):
     r"""Generate a blank unprocessed HRTEM intensity image as a ``hyperspy`` 
     signal.
 
@@ -423,7 +535,7 @@ def blank_unprocessed_image_signal(sample_specification):
 
     Returns
     -------
-    blank_unprocessed_image_signal : :class:`hyperspy._signals.signal2d.Signal2D`
+    image_signal : :class:`hyperspy._signals.signal2d.Signal2D`
         The blank unprocessed image, represented as a ``hyperspy`` signal.  The
         convention used in prismatique is that, when converted to a ``hyperspy``
         signal, the HRTEM intensity image is visualized with the :math:`x`-axis
@@ -432,15 +544,36 @@ def blank_unprocessed_image_signal(sample_specification):
         both expressed in units of :math:`Å`.
 
     """
-    kwargs = \
-        {"sample_specification": sample_specification,
-         "navigation_dims": tuple(),
-         "signal_is_cbed_pattern_set": False,
-         "signal_dtype": "float"}
-    blank_unprocessed_image_signal = \
-        prismatique._signal._blank_unprocessed_2d_signal(**kwargs)
+    params = locals()
 
-    return blank_unprocessed_image_signal
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
+
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    image_signal = _blank_unprocessed_image_signal(**kwargs)
+
+    return image_signal
+
+
+
+def _blank_unprocessed_image_signal(sample_specification):
+    kwargs = {"sample_specification": sample_specification,
+              "navigation_dims": tuple(),
+              "signal_is_cbed_pattern_set": False,
+              "signal_dtype": "float"}
+    image_signal = prismatique._signal._blank_unprocessed_2d_signal(**kwargs)
+
+    return image_signal
 
 
 

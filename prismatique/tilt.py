@@ -630,6 +630,8 @@ def series(sample_specification,
         beam tilt in units of mrad, where ``0<=i<num_tilts``.
 
     """
+    params = locals()
+
     func_alias = _check_and_convert_skip_validation_and_conversion
     skip_validation_and_conversion = func_alias(params)
 
@@ -660,19 +662,25 @@ def _series(sample_specification, mean_beam_energy, tilt_params):
          "tilt_window": tilt_params_core_attrs["window"],
          "for_a_hrtem_calculation": True}
     angular_mesh, beam_mask = \
-        prismatique.sample._calc_angular_mesh_and_beam_mask(**kwargs)
+        prismatique.sample._angular_mesh_and_beam_mask(**kwargs)
 
-    tilt_series = []
+    tilt_series = tuple()
     for k_x_idx in range(beam_mask.shape[0]):
         for k_y_idx in range(beam_mask.shape[1]):
             if beam_mask[k_x_idx][k_y_idx]:
                 x_tilt = angular_mesh[0][k_x_idx][k_y_idx]  # In rads.
                 y_tilt = angular_mesh[1][k_x_idx][k_y_idx]  # In rads.
-                tilt_series.append((x_tilt*1000, y_tilt*1000))  # In mrads.
+                tilt_series += ((x_tilt*1000, y_tilt*1000),)  # In mrads.
 
     tilt_series = np.array(tilt_series)
     reordered_indices = np.lexsort((tilt_series[:, 1], tilt_series[:, 0]))
     tilt_series = tilt_series[reordered_indices]
+
+    rows = tilt_series.tolist()
+
+    tilt_series = tuple()
+    for idx, row in enumerate(rows):
+        tilt_series += (tuple(row),)
 
     return tilt_series
 

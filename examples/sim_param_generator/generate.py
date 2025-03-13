@@ -1,8 +1,21 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 """An example of generating simulation parameters to be used in future
 simulations.
 
 See the link
-https://mrfitzpa.gitlab.io/prismatique/examples/sim-param-generator/generate.html
+https://mrfitzpa.github.io/prismatique/examples/sim-param-generator/generate.html
 for a description of the example.
 
 A NOTE BEFORE STARTING
@@ -56,16 +69,15 @@ import prismatique
 
 
 
-############################
-## Authorship information ##
-############################
+###############################################
+## Define classes, functions, and contstants ##
+###############################################
 
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+
+
+###########################
+## Define error messages ##
+###########################
 
 
 
@@ -112,11 +124,15 @@ worker_params = prismatique.worker.Params(**kwargs)
 # :class:`prismatique.discretization.Params` for details on these parameters and
 # how real-space and k-space are discretized.
 sample_supercell_reduced_xy_dims_in_pixels = (32, 32)
-kwargs = {"z_supersampling": 16,
+
+kwargs = {"z_supersampling": \
+          16,
           "sample_supercell_reduced_xy_dims_in_pixels": \
           sample_supercell_reduced_xy_dims_in_pixels,
-          "interpolation_factors": (1, 1),
-          "num_slices": 16}
+          "interpolation_factors": \
+          (1, 1),
+          "num_slices": \
+          16}
 discretization_params = prismatique.discretization.Params(**kwargs)
 
 

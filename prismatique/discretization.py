@@ -378,10 +378,10 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         copies or conversions are made in this case.
 
     """
-    ctor_param_names = ("enable_workers",
-                        "num_worker_threads",
-                        "batch_size",
-                        "early_stop_count")
+    ctor_param_names = ("z_supersampling",
+                        "sample_supercell_reduced_xy_dims_in_pixels",
+                        "interpolation_factors",
+                        "num_slices")
     kwargs = {"namespace_as_dict": globals(),
               "ctor_param_names": ctor_param_names}
     

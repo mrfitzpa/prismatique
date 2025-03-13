@@ -1,7 +1,20 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 """An example of atomic coordinate generation.
 
 See the link
-https://mrfitzpa.gitlab.io/prismatique/examples/atomic-coord-generator/generate.html
+https://mrfitzpa.github.io/prismatique/examples/atomic-coord-generator/generate.html
 for a description of the example.
 
 A NOTE BEFORE STARTING
@@ -42,17 +55,15 @@ import numpy as np
 
 
 
-############################
-## Authorship information ##
-############################
+###############################################
+## Define classes, functions, and contstants ##
+###############################################
 
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
 
+
+###########################
+## Define error messages ##
+###########################
 
 
 
@@ -109,7 +120,7 @@ num_atomic_layers = 2
 
 
 
-# We tile the Mo and S unit cells and rotate each atom about the origin.
+# We tile the Mo and S unit cells.
 num_y_tiles = 4
 num_x_tiles = int(np.round(num_y_tiles * np.sqrt(3)))
 x_tiling_indices = range(0, num_x_tiles)

@@ -99,7 +99,7 @@ def _de_pre_serialize_batch_size(serializable_rep):
 
 
 
-def _check_and_convert_data_transfer_mode(ctor_params):
+def _check_and_convert_data_transfer_mode(params):
     obj_name = "data_transfer_mode"
     kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     obj = czekitout.convert.to_str_from_str_like(**kwargs)
@@ -116,7 +116,7 @@ def _check_and_convert_data_transfer_mode(ctor_params):
 
 
 def _pre_serialize_data_transfer_mode(data_transfer_mode):
-    obj_to_pre_serialize = early_stop_count
+    obj_to_pre_serialize = data_transfer_mode
     serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
@@ -154,18 +154,16 @@ def _de_pre_serialize_num_streams_per_gpu(serializable_rep):
 
 
 
-_module_alias = \
-    prismatique.worker.cpu
 _default_num_gpus = \
     4
 _default_batch_size = \
-    _module_alias._default_batch_size
+    1
 _default_data_transfer_mode = \
     "auto"
 _default_num_streams_per_gpu = \
     3
 _default_skip_validation_and_conversion = \
-    _module_alias._default_skip_validation_and_conversion
+    False
 
 
 
@@ -280,10 +278,10 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         copies or conversions are made in this case.
 
     """
-    ctor_param_names = ("enable_workers",
-                        "num_worker_threads",
+    ctor_param_names = ("num_gpus",
                         "batch_size",
-                        "early_stop_count")
+                        "data_transfer_mode",
+                        "num_streams_per_gpu")
     kwargs = {"namespace_as_dict": globals(),
               "ctor_param_names": ctor_param_names}
     
@@ -304,7 +302,7 @@ class Params(fancytypes.PreSerializableAndUpdatable):
                  batch_size=\
                  _default_batch_size,
                  data_transfer_mode=\
-                 _default_data_transfor_mode,
+                 _default_data_transfer_mode,
                  num_streams_per_gpu=\
                  _default_num_streams_per_gpu,
                  skip_validation_and_conversion=\

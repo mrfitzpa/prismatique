@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For running STEM simulations.
 
 """
@@ -68,18 +81,8 @@ import prismatique.scan
 # For generating and postprocessing CBED patterns.
 import prismatique._signal
 
-
-
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+# For recycling helper functions and/or constants.
+import prismatique.hrtem.sim
 
 
 
@@ -93,115 +96,98 @@ __all__ = ["Params",
 
 
 
-def _check_and_convert_stem_system_model_params(ctor_params):
-    func_alias = _check_and_convert_stem_system_model_params_and_output_params
-    stem_system_model_params, _ = func_alias(ctor_params)
-    
+def _check_and_convert_stem_system_model_params(params):
+    module_alias = prismatique.stem.system
+    func_alias = module_alias._check_and_convert_stem_system_model_params
+    stem_system_model_params = func_alias(params)
+
     return stem_system_model_params
 
 
 
-def _check_and_convert_stem_system_model_params_and_output_params(ctor_params):
-    check_and_convert_stem_system_model_params = \
-        prismatique.stem.system._check_and_convert_stem_system_model_params
-    check_and_convert_output_params = \
-        prismatique.stem.output._check_and_convert_output_params
-    check_sample_specification_wrt_output_params = \
-        prismatique.stem.output._check_sample_specification_wrt_output_params
-
-    stem_system_model_params = \
-        check_and_convert_stem_system_model_params(ctor_params)
-    
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-    output_params = \
-        check_and_convert_output_params(ctor_params)
-    format_arg = \
-        "stem_system_model_params.core_attrs['sample_specification']"
-
-    check_sample_specification_wrt_output_params(sample_specification,
-                                                 output_params,
-                                                 format_arg)
-    
-    return stem_system_model_params, output_params
-
-
-
 def _pre_serialize_stem_system_model_params(stem_system_model_params):
-    pre_serialize_stem_system_model_params = \
-        prismatique.stem.system._pre_serialize_stem_system_model_params
-    serializable_rep = \
-        pre_serialize_stem_system_model_params(stem_system_model_params)
+    obj_to_pre_serialize = stem_system_model_params
+    module_alias = prismatique.stem.system
+    func_alias = module_alias._pre_serialize_stem_system_model_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_stem_system_model_params(serializable_rep):
-    de_pre_serialize_stem_system_model_params = \
-        prismatique.stem.system._de_pre_serialize_stem_system_model_params
-    stem_system_model_params = \
-        de_pre_serialize_stem_system_model_params(serializable_rep)
+    module_alias = prismatique.stem.system
+    func_alias = module_alias._de_pre_serialize_stem_system_model_params
+    stem_system_model_params = func_alias(serializable_rep)
 
     return stem_system_model_params
 
 
 
-def _check_and_convert_output_params(ctor_params):
-    func_alias = _check_and_convert_stem_system_model_params_and_output_params
-    _, output_params = func_alias(ctor_params)
-    
+def _check_and_convert_output_params(params):
+    module_alias = prismatique.stem.output
+    func_alias = module_alias._check_and_convert_output_params
+    output_params = func_alias(params)
+
     return output_params
 
 
 
 def _pre_serialize_output_params(output_params):
-    pre_serialize_output_params = \
-        prismatique.stem.output._pre_serialize_output_params
-    serializable_rep = \
-        pre_serialize_output_params(output_params)
+    obj_to_pre_serialize = output_params
+    module_alias = prismatique.stem.output
+    func_alias = module_alias._pre_serialize_output_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_output_params(serializable_rep):
-    de_pre_serialize_output_params = \
-        prismatique.stem.output._de_pre_serialize_output_params
-    output_params = \
-        de_pre_serialize_output_params(serializable_rep)
+    module_alias = prismatique.stem.output
+    func_alias = module_alias._de_pre_serialize_output_params
+    output_params = func_alias(serializable_rep)
 
     return output_params
 
 
 
-def _check_and_convert_worker_params(ctor_params):
-    check_and_convert_worker_params = \
-        prismatique.worker._check_and_convert_worker_params
-    worker_params = \
-        check_and_convert_worker_params(ctor_params)
-    
+def _check_and_convert_worker_params(params):
+    module_alias = prismatique.worker
+    func_alias = module_alias._check_and_convert_worker_params
+    worker_params = func_alias(params)
+
     return worker_params
 
 
 
 def _pre_serialize_worker_params(worker_params):
-    pre_serialize_worker_params = \
-        prismatique.worker._pre_serialize_worker_params
-    serializable_rep = \
-        pre_serialize_worker_params(worker_params)
+    obj_to_pre_serialize = worker_params
+    module_alias = prismatique.worker
+    func_alias = module_alias._pre_serialize_worker_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_worker_params(serializable_rep):
-    de_pre_serialize_worker_params = \
-        prismatique.worker._de_pre_serialize_worker_params
-    worker_params = \
-        de_pre_serialize_worker_params(serializable_rep)
+    module_alias = prismatique.worker
+    func_alias = module_alias._de_pre_serialize_worker_params
+    worker_params = func_alias(serializable_rep)
 
     return worker_params
+
+
+
+_module_alias = \
+    prismatique.worker
+_default_output_params = \
+    None
+_default_worker_params = \
+    _module_alias._default_worker_params
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -227,135 +213,164 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         discussion on said parameters. If ``worker_params`` is set to `None`
         [i.e. the default value], then the aforementioned simulation parameters 
         are set to default values.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
 
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
+    
     """
-    _validation_and_conversion_funcs = \
-        {"stem_system_model_params": \
-         _check_and_convert_stem_system_model_params,
-         "output_params": _check_and_convert_output_params,
-         "worker_params": _check_and_convert_worker_params}
+    ctor_param_names = ("stem_system_model_params",
+                        "output_params",
+                        "worker_params")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"stem_system_model_params": _pre_serialize_stem_system_model_params,
-         "output_params": _pre_serialize_output_params,
-         "worker_params": _pre_serialize_worker_params}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"stem_system_model_params": _de_pre_serialize_stem_system_model_params,
-         "output_params": _de_pre_serialize_output_params,
-         "worker_params": _de_pre_serialize_worker_params}
+    
     
     def __init__(self,
                  stem_system_model_params,
-                 output_params=None,
-                 worker_params=None):
-        ctor_params = {"stem_system_model_params": stem_system_model_params,
-                       "output_params": output_params,
-                       "worker_params": worker_params}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 output_params=\
+                 _default_output_params,
+                 worker_params=\
+                 _default_worker_params,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_sim_params(ctor_params):
-    sim_params = copy.deepcopy(ctor_params["sim_params"])    
-    kwargs = {"obj": sim_params,
-              "obj_name": "sim_params",
-              "accepted_types": (Params,)}
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
+    
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_sim_params(params):
+    obj_name = "sim_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params,)
+
+    kwargs = {"obj": obj,
+              "obj_name": obj_name,
+              "accepted_types": accepted_types}
     czekitout.check.if_instance_of_any_accepted_types(**kwargs)
 
-    return sim_params
+    kwargs = obj.get_core_attrs(deep_copy=False)
+    sim_params = accepted_types[0](**kwargs)
 
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
 
+    kwargs = {"params": dict()}
+    kwargs["params"]["stem_system_model_params"] = stem_system_model_params
+    _check_and_convert_stem_system_model_params(**kwargs)
 
-def _pre_serialize_sim_params(sim_params):
-    serializable_rep = sim_params.pre_serialize()
-
-    return serializable_rep
-
-
-
-def _de_pre_serialize_sim_params(serializable_rep):
-    sim_params = Params.de_pre_serialize(serializable_rep)
-
-    return sim_params
-
-
-
-def run(sim_params):
-    r"""Run STEM simulation.
-
-    Parameters
-    ----------
-    sim_params : :class:`prismatique.stem.sim.Params`
-        The STEM simulation parameters. See the documentation for the class
-        :class:`prismatique.stem.sim.Params` for a discussion on said 
-        parameters.
-
-    Returns
-    -------
-
-    """
-    _check_sim_params(sim_params)
-    _run(sim_params)
-    _serialize_sim_params(sim_params)
-    print("\n\n\n")
-
-    return None
-
-
-
-def _check_sim_params(sim_params):
-    temp_ctor_params = {"sim_params": sim_params}
-    sim_params = _check_and_convert_sim_params(temp_ctor_params)
-    
-    mod_alias = prismatique.stem.output
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    mod_alias._check_stem_system_model_params(stem_system_model_params)
-    
     _pre_save(sim_params)
     _check_data_size(sim_params)
 
-    return None
+    return sim_params
 
 
 
 def _pre_save(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)
+    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-    
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    alg_specific_output_params = output_params.core_attrs["alg_specific_params"]
-    
-    output_dirname = base_output_params.core_attrs["output_dirname"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
-    if base_output_params.core_attrs["save_potential_slices"]:
-        unformatted_basename = "potential_slices_of_subset_{}.h5"
-        prismatique.sample._pre_save(sample_specification,
-                                     output_dirname,
-                                     unformatted_basename)
-    if "save_S_matrices" in alg_specific_output_params.core_attrs:
-        if alg_specific_output_params.core_attrs["save_S_matrices"]:
-            unformatted_basename = "S_matrices_of_subset_{}.h5"
-            prismatique.sample._pre_save(sample_specification,
-                                         output_dirname,
-                                         unformatted_basename)
+    output_params_core_attrs = output_params.get_core_attrs(deep_copy=False)
+    base_output_params = output_params_core_attrs["base_params"]
+    alg_specific_output_params = output_params_core_attrs["alg_specific_params"]
 
-    filenames = []
-    filenames.append(_intensity_output_filename(sim_params))
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    alg_specific_output_params_core_attrs = \
+        alg_specific_output_params.get_core_attrs(deep_copy=False)
+
+    kwargs = {"sample_specification": sample_specification,
+              "output_dirname": base_output_params_core_attrs["output_dirname"]}
+    if base_output_params_core_attrs["save_potential_slices"]:
+        kwargs["unformatted_basename"] = "potential_slices_of_subset_{}.h5"
+        prismatique.sample._pre_save(**kwargs)
+    if "save_S_matrices" in alg_specific_output_params_core_attrs:
+        if alg_specific_output_params_core_attrs["save_S_matrices"]:
+            kwargs["unformatted_basename"] = "S_matrices_of_subset_{}.h5"
+            prismatique.sample._pre_save(**kwargs)
+
+    filenames = tuple()
+    if _intensity_output_is_to_be_saved(sim_params):
+        filenames += (_intensity_output_filename(sim_params),)
     if _wavefunction_output_is_to_be_saved(sim_params):
         filenames += _wavefunction_output_filenames(sim_params)
 
@@ -370,9 +385,15 @@ def _pre_save(sim_params):
 
 
 def _intensity_output_is_to_be_saved(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
 
     kwargs = \
         {"base_output_params": base_output_params}
@@ -391,11 +412,53 @@ def _intensity_output_filename(sim_params):
 
 
 
-def _wavefunction_output_is_to_be_saved(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
+def _output_param_subset(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
 
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+    alg_specific_output_params = \
+        output_params_core_attrs["alg_specific_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    alg_specific_output_params_core_attrs = \
+        alg_specific_output_params.get_core_attrs(deep_copy=False)
+    
+    output_dirname = \
+        base_output_params_core_attrs["output_dirname"]
+    save_potential_slices = \
+        base_output_params_core_attrs["save_potential_slices"]
+
+    save_S_matrices = \
+        (alg_specific_output_params_core_attrs["save_S_matrices"]
+         if ("save_S_matrices" in alg_specific_output_params_core_attrs)
+         else False)
+
+    output_param_subset = {"output_dirname": output_dirname,
+                           "save_potential_slices": save_potential_slices,
+                           "save_S_matrices": save_S_matrices}
+
+    return output_param_subset
+
+
+
+def _wavefunction_output_is_to_be_saved(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+    
     kwargs = \
         {"base_output_params": base_output_params}
     wavefunction_output_is_to_be_saved = \
@@ -406,27 +469,44 @@ def _wavefunction_output_is_to_be_saved(sim_params):
 
 
 def _wavefunction_output_filenames(sim_params):
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]    
-    output_dirname = base_output_params.core_attrs["output_dirname"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    output_dirname = \
+        base_output_params_core_attrs["output_dirname"]
 
     num_atomic_config_subsets = _num_atomic_config_subsets(sim_params)
 
-    filenames = []
+    filenames = tuple()
     for atomic_config_subset_idx in range(num_atomic_config_subsets):
         unformatted_basename = "stem_sim_wavefunction_output_of_subset_{}.h5"
         basename = unformatted_basename.format(atomic_config_subset_idx)
-        filenames.append(output_dirname + "/" + basename)
+        filename = output_dirname + "/" + basename
+        filenames += (filename,)
 
     return filenames
 
 
 
 def _num_atomic_config_subsets(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
     kwargs = \
         {"sample_specification": sample_specification}
@@ -438,20 +518,63 @@ def _num_atomic_config_subsets(sim_params):
 
 
 def _check_data_size(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)
+    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
 
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    max_data_size = base_output_params.core_attrs["max_data_size"]
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+    
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    max_data_size = \
+        base_output_params_core_attrs["max_data_size"]
 
     kwargs = {"stem_system_model_params": stem_system_model_params,
               "output_params": output_params}
     output_data_size = prismatique.stem.output._data_size(**kwargs)
 
+    current_func_name = "_check_data_size"
+
     if max_data_size < output_data_size:
-        unformatted_err_msg = _check_data_size_err_msg_1
+        unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
         err_msg = unformatted_err_msg.format(output_data_size, max_data_size)
         raise MemoryError(err_msg)
+
+    return None
+
+
+
+def run(sim_params):
+    r"""Run STEM simulation.
+
+    Parameters
+    ----------
+    sim_params : :class:`prismatique.stem.sim.Params`
+        The STEM simulation parameters. See the documentation for the class
+        :class:`prismatique.stem.sim.Params` for a discussion on said 
+        parameters.
+
+    Returns
+    -------
+
+    """
+    params = locals()
+
+    global_symbol_table = globals()
+    for param_name in params:
+        func_name = "_check_and_convert_" + param_name
+        func_alias = global_symbol_table[func_name]
+        params[param_name] = func_alias(params)
+
+    kwargs = params
+    _run(**kwargs)
 
     return None
 
@@ -463,34 +586,41 @@ def _run(sim_params):
     _remove_temp_files(sim_params, subset_idx=0, first_or_last_call=True)
     _initialize_output_files(sim_params)
 
-    try:
-        for atomic_config_subset_idx in range(num_atomic_config_subsets):
-            kwargs = {"sim_params": sim_params,
-                      "atomic_config_subset_idx": atomic_config_subset_idx,
-                      "rng_seeds": rng_seeds}
-            _run_prismatic_sims_and_postprocess_output_for_subset(**kwargs)
+    for atomic_config_subset_idx in range(num_atomic_config_subsets):
+        kwargs = {"sim_params": sim_params,
+                  "atomic_config_subset_idx": atomic_config_subset_idx,
+                  "rng_seeds": rng_seeds}
+        _run_prismatic_sims_and_postprocess_output_for_subset(**kwargs)
 
-        _remove_temp_files(sim_params, subset_idx=0, first_or_last_call=True)
+    _remove_temp_files(sim_params, subset_idx=0, first_or_last_call=True)
+
+    _serialize_sim_params(sim_params)
+
+    print("\n\n\n")
             
-    except BaseException as err:
-        _remove_temp_files(sim_params, subset_idx=0, first_or_last_call=True)
-        raise err
-
     return None
 
 
 
 def _generate_thermal_rng_seeds_from_sim_params(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)
+    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+    
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
+
+    module_alias = \
+        prismatique.sample
     kwargs = \
         {"sample_specification": sample_specification}
-    mod_alias = \
-        prismatique.sample
     rng_seeds = \
-        mod_alias._generate_rng_seeds_from_sample_specification(**kwargs)
+        module_alias._generate_rng_seeds_from_sample_specification(**kwargs)
 
     return rng_seeds
 
@@ -515,30 +645,6 @@ def _remove_temp_files(sim_params, subset_idx, first_or_last_call):
 
 
 
-def _output_param_subset(sim_params):
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    alg_specific_output_params = output_params.core_attrs["alg_specific_params"]
-    
-    output_dirname = \
-        base_output_params.core_attrs["output_dirname"]
-    save_potential_slices = \
-        base_output_params.core_attrs["save_potential_slices"]
-
-    if "save_S_matrices" in alg_specific_output_params.core_attrs:
-        save_S_matrices = \
-            alg_specific_output_params.core_attrs["save_S_matrices"]
-    else:
-        save_S_matrices = False
-
-    output_param_subset = {"output_dirname": output_dirname,
-                           "save_potential_slices": save_potential_slices,
-                           "save_S_matrices": save_S_matrices}
-
-    return output_param_subset
-
-
-
 def _initialize_output_files(sim_params):
     _write_metadata_to_output_files(sim_params)
     _initialize_data_in_output_files(sim_params)
@@ -548,8 +654,8 @@ def _initialize_output_files(sim_params):
 
 
 def _write_metadata_to_output_files(sim_params):
-    filenames = []
-    filenames.append(_intensity_output_filename(sim_params))
+    filenames = tuple()
+    filenames += (_intensity_output_filename(sim_params),)
     if _wavefunction_output_is_to_be_saved(sim_params):
         filenames += _wavefunction_output_filenames(sim_params)
 
@@ -569,9 +675,12 @@ def _write_metadata_to_output_files(sim_params):
 
 
 def _write_probe_position_metadata_to_output_file(sim_params, filename):
+    pattern_type = _scan_pattern_type(sim_params)
+    grid_dims = _grid_dims_in_units_of_probe_shifts(sim_params)
+
     path_in_file = "/metadata"
     group_id = h5pywrappers.obj.ID(filename, path_in_file)
-    h5pywrappers.group.save(None, group_id, write_mode="a")
+    h5pywrappers.group.save(None, group_id, write_mode="w")
     group = h5pywrappers.group.load(group_id, read_only=False)
 
     probe_positions = _generate_probe_positions(sim_params, save=False)
@@ -581,10 +690,8 @@ def _write_probe_position_metadata_to_output_file(sim_params, filename):
     dataset.attrs["dim 1"] = "probe idx"
     dataset.attrs["dim 2"] = "vector component idx [0->x, 1->y]"
     dataset.attrs["units"] = "Å"
-    dataset.attrs["pattern type"] = _scan_pattern_type(sim_params)
-    if len(_grid_dims_in_units_of_probe_shifts(sim_params)) != 3:
-        dataset.attrs["grid dims in units of probe shifts"] = \
-            _grid_dims_in_units_of_probe_shifts(sim_params)
+    dataset.attrs["pattern type"] = pattern_type
+    dataset.attrs["grid dims in units of probe shifts"] = grid_dims
 
     group.file.close()
 
@@ -593,18 +700,29 @@ def _write_probe_position_metadata_to_output_file(sim_params, filename):
 
 
 def _generate_probe_positions(sim_params, save):
-    output_params = \
-        sim_params.core_attrs["output_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
-    
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-    scan_config = \
-        stem_system_model_params.core_attrs["scan_config"]
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
 
-    base_output_params = output_params.core_attrs["base_params"]
-    output_dirname = base_output_params.core_attrs["output_dirname"]
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+    sample_specification = \
+        stem_system_model_params_core_attrs["sample_specification"]
+    scan_config = \
+        stem_system_model_params_core_attrs["scan_config"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    output_dirname = \
+        base_output_params_core_attrs["output_dirname"]
 
     temp_scan_config_filename = \
         prismatique.sample._generate_temp_scan_config_filename(output_dirname)
@@ -621,21 +739,35 @@ def _generate_probe_positions(sim_params, save):
 
 
 def _scan_pattern_type(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    scan_config = stem_system_model_params.core_attrs["scan_config"]
-    scan_pattern_type = prismatique.scan._pattern_type(scan_config)
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+    scan_config = \
+        stem_system_model_params_core_attrs["scan_config"]
+
+    scan_pattern_type = \
+        prismatique.scan._pattern_type(scan_config)
 
     return scan_pattern_type
 
 
 
 def _grid_dims_in_units_of_probe_shifts(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
     scan_config = \
-        stem_system_model_params.core_attrs["scan_config"]
+        stem_system_model_params_core_attrs["scan_config"]
 
     kwargs = {"sample_specification": sample_specification,
               "scan_config": scan_config}
@@ -664,16 +796,25 @@ def _write_output_layer_depth_metadata_to_output_file(sim_params, filename):
 
 
 def _output_layer_depths(sim_params):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
 
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
-    alg_specific_params = output_params.core_attrs["alg_specific_params"]
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    alg_specific_output_params = \
+        output_params_core_attrs["alg_specific_params"]
 
     kwargs = {"sample_specification": sample_specification,
-              "alg_specific_params": alg_specific_params}
+              "alg_specific_params": alg_specific_output_params}
     output_layer_depths = prismatique.stem.output._layer_depths(**kwargs)
 
     return output_layer_depths
@@ -685,10 +826,10 @@ def _write_k_x_and_k_y_metadata_to_output_file(sim_params, filename):
     group_id = h5pywrappers.obj.ID(filename, path_in_file)
     group = h5pywrappers.group.load(group_id, read_only=False)
 
-    if filename == _intensity_output_filename(sim_params):
-        for_postprocessed_dp = True
-    else:
-        for_postprocessed_dp = False
+    for_postprocessed_dp = \
+        (True
+         if (filename == _intensity_output_filename(sim_params))
+         else False)
 
     k_x = _k_x(sim_params, for_postprocessed_dp)
     dataset = group.create_dataset(name="k_x", data=k_x, dtype="float32")
@@ -710,10 +851,9 @@ def _k_x(sim_params, for_postprocessed_dp):
     kwargs = {"sim_params": sim_params,
               "navigation_dims": tuple(),
               "signal_dtype": "float"}
-    if for_postprocessed_dp:
-        dp_set_signal = _blank_postprocessed_dp_set_signal(**kwargs)
-    else:
-        dp_set_signal = _blank_unprocessed_dp_set_signal(**kwargs)
+    dp_set_signal = (_blank_postprocessed_dp_set_signal(**kwargs)
+                     if for_postprocessed_dp
+                     else _blank_unprocessed_dp_set_signal(**kwargs))
 
     offset = dp_set_signal.axes_manager[0].offset
     size = dp_set_signal.axes_manager[0].size
@@ -729,10 +869,9 @@ def _k_y(sim_params, for_postprocessed_dp):
     kwargs = {"sim_params": sim_params,
               "navigation_dims": tuple(),
               "signal_dtype": "float"}
-    if for_postprocessed_dp:
-        dp_set_signal = _blank_postprocessed_dp_set_signal(**kwargs)
-    else:
-        dp_set_signal = _blank_unprocessed_dp_set_signal(**kwargs)
+    dp_set_signal = (_blank_postprocessed_dp_set_signal(**kwargs)
+                     if for_postprocessed_dp
+                     else _blank_unprocessed_dp_set_signal(**kwargs))
 
     offset = dp_set_signal.axes_manager[1].offset
     size = dp_set_signal.axes_manager[1].size
@@ -747,15 +886,32 @@ def _k_y(sim_params, for_postprocessed_dp):
 def _blank_postprocessed_dp_set_signal(sim_params,
                                        navigation_dims,
                                        signal_dtype):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
 
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
-    base_output_params = output_params.core_attrs["base_params"]
-    cbed_params = base_output_params.core_attrs["cbed_params"]
-    postprocessing_seq = cbed_params.core_attrs["postprocessing_seq"]
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    cbed_params = \
+        base_output_params_core_attrs["cbed_params"]
+
+    cbed_params_core_attrs = \
+        cbed_params.get_core_attrs(deep_copy=False)
+    postprocessing_seq = \
+        cbed_params_core_attrs["postprocessing_seq"]
 
     kwargs = \
         {"sample_specification": sample_specification,
@@ -771,10 +927,15 @@ def _blank_postprocessed_dp_set_signal(sim_params,
 
 
 def _blank_unprocessed_dp_set_signal(sim_params, navigation_dims, signal_dtype):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
     kwargs = \
         {"sample_specification": sample_specification,
@@ -785,23 +946,6 @@ def _blank_unprocessed_dp_set_signal(sim_params, navigation_dims, signal_dtype):
         prismatique._signal._blank_unprocessed_2d_signal(**kwargs)
 
     return blank_unprocessed_dp_set_signal
-
-
-
-def _intensity_2d_stem_output_is_to_be_saved(sim_params):
-    output_params = \
-        sim_params.core_attrs["output_params"]
-    base_output_params = \
-        output_params.core_attrs["base_params"]
-    radial_step_size_for_3d_stem = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
-
-    if radial_step_size_for_3d_stem > 0:
-        intensity_2d_stem_output_is_to_be_saved = True
-    else:
-        intensity_2d_stem_output_is_to_be_saved = False
-
-    return intensity_2d_stem_output_is_to_be_saved
 
 
 
@@ -863,12 +1007,26 @@ def _integrate_dp_to_3d_stem_signal(input_signal, sim_params):
 
 
 def _num_bins_in_3d_stem_integration(sim_params, input_signal):
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    stem_system_model_params = \
+        sim_params_core_attrs["stem_system_model_params"]
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+    probe_model_params = \
+        stem_system_model_params_core_attrs["probe_model_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
 
     kwargs = \
-        {"stem_system_model_params": stem_system_model_params,
-         "output_params": output_params,
+        {"probe_model_params": probe_model_params,
+         "base_output_params": base_output_params,
          "input_signal": input_signal}
     num_bins = \
         prismatique.stem.output._num_bins_in_3d_stem_integration(**kwargs)
@@ -879,13 +1037,21 @@ def _num_bins_in_3d_stem_integration(sim_params, input_signal):
 
 def _radial_k_range_in_3d_stem_integration(sim_params, input_signal):
     wavelength = _wavelength(sim_params)
-    
+
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
+        sim_params_core_attrs["output_params"]
+    
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
     base_output_params = \
-        output_params.core_attrs["base_params"]
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     radial_angular_step_size = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
+        base_output_params_core_attrs["radial_step_size_for_3d_stem"]
     radial_k_step_size = \
         (radial_angular_step_size / 1000) / wavelength
 
@@ -898,14 +1064,26 @@ def _radial_k_range_in_3d_stem_integration(sim_params, input_signal):
 
 
 def _wavelength(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+        stem_system_model_params_core_attrs["probe_model_params"]
+
+    probe_model_params_core_attrs = \
+        probe_model_params.get_core_attrs(deep_copy=False)
     gun_model_params = \
-        probe_model_params.core_attrs["gun_model_params"]
+        probe_model_params_core_attrs["gun_model_params"]
+
+    gun_model_params_core_attrs = \
+        gun_model_params.get_core_attrs(deep_copy=False)
     mean_beam_energy = \
-        gun_model_params.core_attrs["mean_beam_energy"]
+        gun_model_params_core_attrs["mean_beam_energy"]
+    
     wavelength = \
         embeam.wavelength(mean_beam_energy)
 
@@ -932,23 +1110,27 @@ def _write_defocus_metadata_to_output_file(sim_params, filename):
 
 
 def _defocii(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+        stem_system_model_params_core_attrs["probe_model_params"]
     
     wavelength = _wavelength(sim_params)
 
-    get_C_2_0_mag_from_probe_model_params = \
-        embeam.stem.probe._get_C_2_0_mag_from_probe_model_params
-    
-    C_2_0_mag = get_C_2_0_mag_from_probe_model_params(probe_model_params)
+    C_2_0_mag = _get_C_2_0_mag_from_probe_model_params(probe_model_params)
     Delta_f = wavelength * C_2_0_mag / np.pi
+
+    gauss_hermite_points, _ = \
+        _gauss_hermite_points_and_weights(probe_model_params)
+    sigma_f = \
+        _sigma_f(probe_model_params)
     
-    sigma_f = probe_model_params._sigma_f
-    defocal_offsets = (np.sqrt(2)
-                       * probe_model_params._gauss_hermite_points
-                       * sigma_f)
+    defocal_offsets = np.sqrt(2) * gauss_hermite_points * sigma_f
 
     defocii = Delta_f + defocal_offsets  # In Å.
 
@@ -956,9 +1138,36 @@ def _defocii(sim_params):
 
 
 
+def _get_C_2_0_mag_from_probe_model_params(probe_model_params):
+    module_alias = prismatique.hrtem.sim
+    func_alias = module_alias._get_C_2_0_mag_from_probe_model_params
+    C_2_0_mag = func_alias(probe_model_params)
+
+    return C_2_0_mag
+
+
+
+def _gauss_hermite_points_and_weights(probe_model_params):
+    module_alias = prismatique.hrtem.sim
+    func_alias = module_alias._gauss_hermite_points_and_weights
+    gauss_hermite_points, gauss_hermite_weights = func_alias(probe_model_params)
+
+    return gauss_hermite_points, gauss_hermite_weights
+
+
+
+def _sigma_f(probe_model_params):
+    module_alias = prismatique.hrtem.sim
+    func_alias = module_alias._sigma_f
+    sigma_f = func_alias(probe_model_params)
+
+    return sigma_f
+
+
+
 def _initialize_data_in_output_files(sim_params):
-    filenames = []
-    filenames.append(_intensity_output_filename(sim_params))
+    filenames = tuple()
+    filenames += (_intensity_output_filename(sim_params),)
     if _wavefunction_output_is_to_be_saved(sim_params):
         filenames += _wavefunction_output_filenames(sim_params)
 
@@ -1024,12 +1233,20 @@ def _initialize_intensity_4d_stem_data_in_output_file(sim_params, filename):
 
 
 def _com_output_is_to_be_saved(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
     base_output_params = \
-        output_params.core_attrs["base_params"]
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     com_output_is_to_be_saved = \
-        base_output_params.core_attrs["save_com"]
+        base_output_params_core_attrs["save_com"]
 
     return com_output_is_to_be_saved
 
@@ -1091,17 +1308,23 @@ def _initialize_intensity_3d_stem_data_in_output_file(sim_params, filename):
 
 
 def _intensity_2d_stem_output_is_to_be_saved(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
-    base_output_params = \
-        output_params.core_attrs["base_params"]
-    radial_range_for_2d_stem = \
-        base_output_params.core_attrs["radial_range_for_2d_stem"]
+        sim_params_core_attrs["output_params"]
 
-    if radial_range_for_2d_stem[0] != radial_range_for_2d_stem[1]:
-        intensity_2d_stem_output_is_to_be_saved = True
-    else:
-        intensity_2d_stem_output_is_to_be_saved = False
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    radial_range_for_2d_stem = \
+        base_output_params_core_attrs["radial_range_for_2d_stem"]
+
+    intensity_2d_stem_output_is_to_be_saved = \
+        (radial_range_for_2d_stem[0] != radial_range_for_2d_stem[1])
 
     return intensity_2d_stem_output_is_to_be_saved
 
@@ -1127,12 +1350,21 @@ def _initialize_intensity_2d_stem_data_in_output_file(sim_params, filename):
     dataset.attrs["dim 2"] = "probe idx"
     dataset.attrs["units"] = "dimensionless"
 
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
     base_output_params = \
-        output_params.core_attrs["base_params"]
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     radial_range_for_2d_stem = \
-        base_output_params.core_attrs["radial_range_for_2d_stem"]
+        base_output_params_core_attrs["radial_range_for_2d_stem"]
+    
     dataset.attrs["lower integration limit in mrads"] = \
         radial_range_for_2d_stem[0]
     dataset.attrs["upper integration limit in mrads"] = \
@@ -1192,10 +1424,16 @@ def _initialize_wavefunction_data_in_output_file(sim_params,
 
 
 def _num_atomic_configs_in_subset(sim_params, atomic_config_subset_idx):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
+    
     kwargs = \
         {"sample_specification": sample_specification,
          "subset_idx": atomic_config_subset_idx}
@@ -1209,40 +1447,44 @@ def _num_atomic_configs_in_subset(sim_params, atomic_config_subset_idx):
 def _initialize_pyprismatic_sim_obj(sim_params):
     pyprismatic_sim_obj = pyprismatic.Metadata()
 
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
-    worker_params = sim_params.core_attrs["worker_params"]
+    sim_params_core_attrs = sim_params.get_core_attrs(deep_copy=False)
+    stem_system_model_params = sim_params_core_attrs["stem_system_model_params"]
+    output_params = sim_params_core_attrs["output_params"]
+    worker_params = sim_params_core_attrs["worker_params"]
 
-    base_output_params = output_params.core_attrs["base_params"]
-    output_dirname = base_output_params.core_attrs["output_dirname"]
+    output_params_core_attrs = output_params.get_core_attrs(deep_copy=False)
+    base_output_params = output_params_core_attrs["base_params"]
 
-    mod_alias = prismatique.sample
-    func_alias = mod_alias._set_pyprismatic_sim_obj_attrs_to_default_values
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    output_dirname = \
+        base_output_params_core_attrs["output_dirname"]
+
+    module_alias = prismatique.sample
+    func_alias = module_alias._set_pyprismatic_sim_obj_attrs_to_default_values
     func_alias(pyprismatic_sim_obj, output_dirname)
 
     _ = _generate_probe_positions(sim_params, save=True)
 
-    stem_system_model_params = sim_params.core_attrs["stem_system_model_params"]
-    output_params = sim_params.core_attrs["output_params"]
-    worker_params = sim_params.core_attrs["worker_params"]
-
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
     
     kwargs = {"pyprismatic_sim_obj": pyprismatic_sim_obj,
               "stem_system_model_params": stem_system_model_params,
               "output_dirname": output_dirname}
     _unpack_stem_system_model_params_into_pyprismatic_sim_obj(**kwargs)
 
-    unpack_stem_output_params_into_pyprismatic_sim_obj = \
-        prismatique.sample._unpack_stem_output_params_into_pyprismatic_sim_obj
+    unpack_output_params_into_pyprismatic_sim_obj = \
+        prismatique.sample._unpack_output_params_into_pyprismatic_sim_obj
     unpack_worker_params_into_pyprismatic_sim_obj = \
         prismatique.sample._unpack_worker_params_into_pyprismatic_sim_obj
 
     kwargs = {"pyprismatic_sim_obj": pyprismatic_sim_obj,
-              "stem_output_params": output_params,
+              "output_params": output_params,
               "sample_specification": sample_specification}
-    unpack_stem_output_params_into_pyprismatic_sim_obj(**kwargs)
+    unpack_output_params_into_pyprismatic_sim_obj(**kwargs)
 
     kwargs = {"pyprismatic_sim_obj": pyprismatic_sim_obj,
               "worker_params": worker_params}
@@ -1254,12 +1496,14 @@ def _initialize_pyprismatic_sim_obj(sim_params):
 
 def _unpack_stem_system_model_params_into_pyprismatic_sim_obj(
         pyprismatic_sim_obj, stem_system_model_params, output_dirname):
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
     probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+        stem_system_model_params_core_attrs["probe_model_params"]
     specimen_tilt = \
-        stem_system_model_params.core_attrs["specimen_tilt"]
+        stem_system_model_params_core_attrs["specimen_tilt"]
 
     unpack_sample_specification_into_pyprismatic_sim_obj = \
         prismatique.sample._unpack_sample_specification_into_pyprismatic_sim_obj
@@ -1293,12 +1537,13 @@ def _run_prismatic_sims_and_postprocess_output_for_subset(
     for defocus_idx in range(num_defocii):
         func_alias = \
             _run_prismatic_sims_and_postprocess_output_for_subset_and_defocus
-
-        kwargs = {"sim_params": sim_params,
-                  "atomic_config_subset_idx": atomic_config_subset_idx,
-                  "defocus_idx": defocus_idx,
-                  "rng_seeds": rng_seeds}
-        func_alias(**kwargs)
+        kwargs = \
+            {"sim_params": sim_params,
+             "atomic_config_subset_idx": atomic_config_subset_idx,
+             "defocus_idx": defocus_idx,
+             "rng_seeds": rng_seeds}
+        _ = \
+            func_alias(**kwargs)
 
     _remove_temp_files(sim_params,
                        subset_idx=atomic_config_subset_idx,
@@ -1346,10 +1591,15 @@ def _update_pyprismatic_sim_obj_for_next_prismatic_sim(pyprismatic_sim_obj,
                                                        atomic_config_subset_idx,
                                                        defocus_idx,
                                                        rng_seeds):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
     output_param_subset = _output_param_subset(sim_params)
     defocii = _defocii(sim_params)  # In Å.
@@ -1361,8 +1611,8 @@ def _update_pyprismatic_sim_obj_for_next_prismatic_sim(pyprismatic_sim_obj,
               "defocus_idx": defocus_idx,
               "defocii": defocii,
               "rng_seeds": rng_seeds}
-    mod_alias = prismatique.sample
-    mod_alias._update_pyprismatic_sim_obj_for_next_prismatic_sim(**kwargs)
+    module_alias = prismatique.sample
+    module_alias._update_pyprismatic_sim_obj_for_next_prismatic_sim(**kwargs)
 
     return None
 
@@ -1379,8 +1629,14 @@ def _postprocess_and_reorganize_current_prismatic_sim_output(
         pyprismatic_sim_obj, sim_params, atomic_config_subset_idx, defocus_idx):
     if defocus_idx == 0:
         output_param_subset = _output_param_subset(sim_params)
-        func_alias = _move_sample_specification_output_to_separate_file
-        kwargs = {"output_dirname": output_param_subset["output_dirname"]}
+        
+        module_alias = \
+            prismatique.sample
+        func_alias = \
+            module_alias._move_sample_specification_output_to_separate_file
+        
+        kwargs = {"output_dirname": output_param_subset["output_dirname"],
+                  "new_output_filename": ""}
         if pyprismatic_sim_obj.savePotentialSlices:
             kwargs["sample_specification_type"] = "potential_slice_subset"
             func_alias(**kwargs)
@@ -1397,30 +1653,19 @@ def _postprocess_and_reorganize_current_prismatic_sim_output(
 
     for output_layer_idx, _ in enumerate(output_layer_depths):
         for atomic_config_idx in range(num_atomic_configs_in_subset):
-            quartet_of_indices = \
-                {"atomic_config_subset_idx": atomic_config_subset_idx,
-                 "output_layer_idx": output_layer_idx,
-                 "atomic_config_idx": atomic_config_idx,
-                 "defocus_idx": defocus_idx}
+            if pyprismatic_sim_obj.save4DOutput:
+                quartet_of_indices = \
+                    {"atomic_config_subset_idx": atomic_config_subset_idx,
+                     "output_layer_idx": output_layer_idx,
+                     "atomic_config_idx": atomic_config_idx,
+                     "defocus_idx": defocus_idx}
             
-            kwargs = {"sim_params": sim_params,
-                      "quartet_of_indices": quartet_of_indices}
-            func_alias = _postprocess_and_reorganize_dp_subset
-            func_alias(**kwargs)
-            gc.collect()
+                kwargs = {"sim_params": sim_params,
+                          "quartet_of_indices": quartet_of_indices}
+                func_alias = _postprocess_and_reorganize_dp_subset
+                func_alias(**kwargs)
+                gc.collect()
 
-    return None
-
-
-
-def _move_sample_specification_output_to_separate_file(
-        output_dirname, sample_specification_type):
-    mod_alias = prismatique.sample
-    kwargs = {"new_output_filename": "",
-              "output_dirname": output_dirname,
-              "sample_specification_type": sample_specification_type}
-    mod_alias._move_sample_specification_output_to_separate_file(**kwargs)
-    
     return None
 
 
@@ -1443,18 +1688,29 @@ def _postprocess_and_reorganize_dp_subset(sim_params, quartet_of_indices):
         _write_unprocessed_complex_dp_subset_to_output_file(**kwargs)
 
     kwargs = \
-        {"unprocessed_intensity_dp_subset_signal": \
-         empix.abs_sq(unprocessed_complex_dp_subset_signal),
-         "sim_params": sim_params}
+        {"sim_params": \
+         sim_params,
+        "unprocessed_intensity_dp_subset_signal": \
+         empix.abs_sq(unprocessed_complex_dp_subset_signal)}
     postprocessed_intensity_dp_subset_signal = \
          _postprocess_intensity_dp_subset_signal(**kwargs)
 
-    kwargs = {"sim_params": sim_params,
-              "filename": _intensity_output_filename(sim_params),
-              "quartet_of_indices": quartet_of_indices,
+    filename = _intensity_output_filename(sim_params)
+    path_in_file = "/data/4D_STEM/intensity_DPs"
+    dataset_id = h5pywrappers.obj.ID(filename, path_in_file)
+    dataset = h5pywrappers.dataset.load(dataset_id, read_only=False)
+
+    kwargs = {"quartet_of_indices": \
+              quartet_of_indices,
+              "dataset": \
+              dataset,
               "postprocessed_intensity_dp_subset_signal": \
-              postprocessed_intensity_dp_subset_signal}
-    _update_intensity_4d_stem_data_in_output_file(**kwargs)
+              postprocessed_intensity_dp_subset_signal,
+              "sim_params": \
+              sim_params}
+    _update_intensity_4d_stem_data_in_output_dataset(**kwargs)
+
+    dataset.file.close()    
 
     return None
 
@@ -1526,11 +1782,26 @@ def _write_unprocessed_complex_dp_subset_to_output_file(
 
 
 def _postprocess_intensity_dp_subset_signal(
-        unprocessed_intensity_dp_subset_signal, sim_params):
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    cbed_params = base_output_params.core_attrs["cbed_params"]
-    postprocessing_seq = cbed_params.core_attrs["postprocessing_seq"]
+        sim_params, unprocessed_intensity_dp_subset_signal):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    cbed_params = \
+        base_output_params_core_attrs["cbed_params"]
+
+    cbed_params_core_attrs = \
+        cbed_params.get_core_attrs(deep_copy=False)
+    postprocessing_seq = \
+        cbed_params_core_attrs["postprocessing_seq"]
 
     kwargs = \
         {"input_signal": unprocessed_intensity_dp_subset_signal,
@@ -1542,19 +1813,15 @@ def _postprocess_intensity_dp_subset_signal(
 
 
 
-def _update_intensity_4d_stem_data_in_output_file(
-        sim_params,
-        filename,
+def _update_intensity_4d_stem_data_in_output_dataset(
         quartet_of_indices,
-        postprocessed_intensity_dp_subset_signal):
+        dataset,
+        postprocessed_intensity_dp_subset_signal,
+        sim_params):
     output_layer_idx = quartet_of_indices["output_layer_idx"]
     atomic_config_idx = quartet_of_indices["atomic_config_idx"]
     atomic_config_subset_idx = quartet_of_indices["atomic_config_subset_idx"]
     defocus_idx = quartet_of_indices["defocus_idx"]
-
-    path_in_file = "/data/4D_STEM/intensity_DPs"
-    dataset_id = h5pywrappers.obj.ID(filename, path_in_file)
-    dataset = h5pywrappers.dataset.load(dataset_id, read_only=False)
 
     dataset[output_layer_idx] += (postprocessed_intensity_dp_subset_signal.data
                                   * _w_f_l(sim_params, l=defocus_idx)
@@ -1564,49 +1831,70 @@ def _update_intensity_4d_stem_data_in_output_file(
     kwargs = {"sim_params": sim_params,
               "atomic_config_subset_idx": atomic_config_subset_idx}
     num_atomic_configs_in_subset = _num_atomic_configs_in_subset(**kwargs)
+    
     num_atomic_config_subsets = _num_atomic_config_subsets(sim_params)
     num_defocii = len(_defocii(sim_params))
 
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    cbed_params = base_output_params.core_attrs["cbed_params"]
+    sim_params_core_attrs = sim_params.get_core_attrs(deep_copy=False)    
+    output_params = sim_params_core_attrs["output_params"]
+
+    output_params_core_attrs = output_params.get_core_attrs(deep_copy=False)
+    base_output_params = output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    cbed_params = \
+        base_output_params_core_attrs["cbed_params"]
 
     if ((atomic_config_subset_idx == num_atomic_config_subsets-1)
         and (atomic_config_idx == num_atomic_configs_in_subset-1)
         and (defocus_idx == num_defocii-1)):
+        cbed_params_core_attrs = \
+            cbed_params.get_core_attrs(deep_copy=False)
         avg_num_electrons_per_postprocessed_dp = \
-            cbed_params.core_attrs["avg_num_electrons_per_postprocessed_dp"]
+            cbed_params_core_attrs["avg_num_electrons_per_postprocessed_dp"]
 
         datasubset = dataset[output_layer_idx].clip(min=0)
         datasubset *= (avg_num_electrons_per_postprocessed_dp
-                       / np.mean(np.sum(datasubset, axis=(-2, -1))))
-        if cbed_params.core_attrs["apply_shot_noise"]:
+                   / np.mean(np.sum(datasubset, axis=(-2, -1))))
+        if cbed_params_core_attrs["apply_shot_noise"]:
             datasubset = np.random.poisson(datasubset)
         dataset[output_layer_idx] = datasubset
-
-    dataset.file.close()
 
     return None
 
 
 
 def _w_f_l(sim_params, l):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
-    probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
 
-    w_f_l = probe_model_params._gauss_hermite_weights[l]
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+    probe_model_params = \
+        stem_system_model_params_core_attrs["probe_model_params"]
+
+    _, gauss_hermite_weights = \
+        _gauss_hermite_points_and_weights(probe_model_params)
+
+    w_f_l = gauss_hermite_weights[l]
 
     return w_f_l
 
 
 
 def _total_num_frozen_phonon_configs(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     stem_system_model_params = \
-        sim_params.core_attrs["stem_system_model_params"]
+        sim_params_core_attrs["stem_system_model_params"]
+
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
 
     kwargs = \
         {"sample_specification": sample_specification}
@@ -1632,13 +1920,13 @@ def _calc_and_write_remaining_intensity_data_to_output_file(sim_params,
                   "output_layer_idx": output_layer_idx,
                   "filename": filename}
         
-        func_aliases = []
+        func_aliases = tuple()
         if _com_output_is_to_be_saved(sim_params):
-            func_aliases.append(func_alias_1)
+            func_aliases += (func_alias_1,)
         if _intensity_3d_stem_output_is_to_be_saved(sim_params):
-            func_aliases.append(func_alias_2)
+            func_aliases += (func_alias_2,)
         if _intensity_2d_stem_output_is_to_be_saved(sim_params):
-            func_aliases.append(func_alias_3)
+            func_aliases += (func_alias_3,)
 
         for func_alias in func_aliases:
             func_alias(**kwargs)
@@ -1649,17 +1937,23 @@ def _calc_and_write_remaining_intensity_data_to_output_file(sim_params,
 
 
 def _intensity_3d_stem_output_is_to_be_saved(sim_params):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
+        sim_params_core_attrs["output_params"]
+    
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
     base_output_params = \
-        output_params.core_attrs["base_params"]
-    radial_step_size_for_3d_stem = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
+        output_params_core_attrs["base_params"]
 
-    if radial_step_size_for_3d_stem > 0:
-        intensity_3d_stem_output_is_to_be_saved = True
-    else:
-        intensity_3d_stem_output_is_to_be_saved = False
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    radial_step_size_for_3d_stem = \
+        base_output_params_core_attrs["radial_step_size_for_3d_stem"]
+
+    intensity_3d_stem_output_is_to_be_saved = \
+        (radial_step_size_for_3d_stem > 0)
 
     return intensity_3d_stem_output_is_to_be_saved
 
@@ -1679,6 +1973,7 @@ def _calc_and_write_com_data_of_output_layer_to_output_file(sim_params,
 
     normalization_signal = empix.annularly_integrate(intensity_4d_stem_signal,
                                                      optional_params)
+    normalization_signal.data[normalization_signal.data == 0] = 1.0
     
     integrand_signal = copy.deepcopy(intensity_4d_stem_signal)
     integrand_signal.data *= k_mesh[0]
@@ -1756,12 +2051,21 @@ def _calc_and_write_intensity_3d_stem_data_of_output_layer_to_output_file(
 
 def _calc_and_write_intensity_2d_stem_data_of_output_layer_to_output_file(
         sim_params, output_layer_idx, filename):
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
     output_params = \
-        sim_params.core_attrs["output_params"]
+        sim_params_core_attrs["output_params"]
+    
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
     base_output_params = \
-        output_params.core_attrs["base_params"]
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     radial_angular_range_for_2d_stem = \
-        np.array(base_output_params.core_attrs["radial_range_for_2d_stem"])
+        np.array(base_output_params_core_attrs["radial_range_for_2d_stem"])
+    
     wavelength = \
         _wavelength(sim_params)
     radial_k_range_for_2d_stem = \
@@ -1798,12 +2102,26 @@ def _calc_and_write_intensity_2d_stem_data_of_output_layer_to_output_file(
 
 def _remove_any_temp_intensity_4d_stem_data_in_output_file(sim_params,
                                                            filename):
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]
-    cbed_params = base_output_params.core_attrs["cbed_params"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
+    
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    cbed_params = \
+        base_output_params_core_attrs["cbed_params"]
+
+    cbed_params_core_attrs = \
+        cbed_params.get_core_attrs(deep_copy=False)
 
     intensity_4d_stem_data_is_temp = \
-        not cbed_params.core_attrs["save_final_intensity"]
+        not cbed_params_core_attrs["save_final_intensity"]
 
     if intensity_4d_stem_data_is_temp:
         path_in_file = "/data/4D_STEM"
@@ -1817,12 +2135,26 @@ def _remove_any_temp_intensity_4d_stem_data_in_output_file(sim_params,
 
 
 def _serialize_sim_params(sim_params):
-    output_params = sim_params.core_attrs["output_params"]
-    base_output_params = output_params.core_attrs["base_params"]    
-    output_dirname = base_output_params.core_attrs["output_dirname"]
+    sim_params_core_attrs = \
+        sim_params.get_core_attrs(deep_copy=False)    
+    output_params = \
+        sim_params_core_attrs["output_params"]
     
-    sim_params.dump(filename=output_dirname+"/stem_sim_params.json",
-                    overwrite=True)
+    output_params_core_attrs = \
+        output_params.get_core_attrs(deep_copy=False)
+    base_output_params = \
+        output_params_core_attrs["base_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    output_dirname = \
+        base_output_params_core_attrs["output_dirname"]
+
+    filename = \
+        output_dirname + "/stem_sim_params.json"
+
+    kwargs = {"filename": filename, "overwrite": True}
+    sim_params.dump(**kwargs)
 
     return None
     

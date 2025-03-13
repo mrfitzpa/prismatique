@@ -93,7 +93,7 @@ def _check_and_convert_avg_num_electrons_per_postprocessed_dp(params):
 def _pre_serialize_avg_num_electrons_per_postprocessed_dp(
         avg_num_electrons_per_postprocessed_dp):
     obj_to_pre_serialize = avg_num_electrons_per_postprocessed_dp
-    serializable_rep = avg_num_electrons_per_postprocessed_dp
+    serializable_rep = obj_to_pre_serialize
 
     return serializable_rep
 
@@ -452,17 +452,9 @@ _default_cbed_params = None
 
 
 def _check_and_convert_sample_specification(params):
-    params["accepted_types"] = \
-        (prismatique.sample.ModelParams,
-         prismatique.sample.PotentialSliceSubsetIDs,
-         prismatique.sample.SMatrixSubsetIDs,
-         prismatique.sample.PotentialSliceAndSMatrixSubsetIDs)
-
     module_alias = prismatique.sample
     func_alias = module_alias._check_and_convert_sample_specification
     sample_specification = func_alias(params)
-
-    del params["accepted_types"]
 
     return sample_specification
 
@@ -536,7 +528,7 @@ def blank_unprocessed_pattern_signal(sample_specification,
 
     Returns
     -------
-    result : :class:`hyperspy._signals.signal2d.Signal2D`
+    pattern_signal : :class:`hyperspy._signals.signal2d.Signal2D`
         The blank unprocessed pattern, represented as a ``hyperspy`` signal.
         The convention used in prismatique is that, when converted to a
         ``hyperspy`` signal, the CBED pattern is visualized with the
@@ -560,16 +552,21 @@ def blank_unprocessed_pattern_signal(sample_specification,
             params[param_name] = func_alias(params)
 
     kwargs = params
-    kwargs["navigation_dims"] = tuple()
-    kwargs["signal_is_cbed_pattern_set"] = True
-    kwargs["signal_dtype"] = "float"
-    result = prismatique._signal._blank_unprocessed_2d_signal(**kwargs)
+    del kwargs["skip_validation_and_conversion"]
+    pattern_signal = _blank_unprocessed_pattern_signal(**kwargs)
 
-    del kwargs["navigation_dims"]
-    del kwargs["signal_is_cbed_pattern_set"]
-    del kwargs["signal_dtype"]
+    return pattern_signal
 
-    return result
+
+
+def _blank_unprocessed_pattern_signal(sample_specification):
+    kwargs = {"sample_specification": sample_specification,
+              "navigation_dims": tuple(),
+              "signal_is_cbed_pattern_set": True,
+              "signal_dtype": "float"}
+    pattern_signal = prismatique._signal._blank_unprocessed_2d_signal(**kwargs)
+
+    return pattern_signal
 
 
 

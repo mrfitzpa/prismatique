@@ -1,6 +1,19 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 """An example of running a HRTEM simulation.
 
-See the link https://mrfitzpa.gitlab.io/prismatique/examples/hrtem-sim/run.html
+See the link https://mrfitzpa.github.io/prismatique/examples/hrtem-sim/run.html
 for a description of the example.
 
 A NOTE BEFORE STARTING
@@ -42,16 +55,15 @@ import prismatique
 
 
 
-############################
-## Authorship information ##
-############################
+###############################################
+## Define classes, functions, and contstants ##
+###############################################
 
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+
+
+###########################
+## Define error messages ##
+###########################
 
 
 
@@ -153,10 +165,12 @@ try:
     # perform the HRTEM simulation. See the documentation for the function
     # :func:`prismatique.hrtem.sim.run` for a discussion on the input parameters
     # of said function.
-    core_attr_subset = {"sample_specification": sample_specification}
-    hrtem_system_model_params.update(core_attr_subset)
-    core_attr_subset = {"hrtem_system_model_params": hrtem_system_model_params}
-    hrtem_sim_params.update(core_attr_subset)
+    new_core_attr_subset_candidate = {"sample_specification": \
+                                      sample_specification}
+    hrtem_system_model_params.update(new_core_attr_subset_candidate)
+    new_core_attr_subset_candidate = {"hrtem_system_model_params": \
+                                      hrtem_system_model_params}
+    hrtem_sim_params.update(new_core_attr_subset_candidate)
 
     msg = "Running the HRTEM simulation for the MoS2 sample..."
     print(msg)
@@ -166,10 +180,12 @@ try:
 except:
     # Could not find valid potential slices to load, hence we perform the HRTEM
     # simulation from scratch using the sample model parameters.
-    core_attr_subset = {"sample_specification": sample_model_params}
-    hrtem_system_model_params.update(core_attr_subset)
-    core_attr_subset = {"hrtem_system_model_params": hrtem_system_model_params}
-    hrtem_sim_params.update(core_attr_subset)
+    new_core_attr_subset_candidate = {"sample_specification": \
+                                      sample_model_params}
+    hrtem_system_model_params.update(new_core_attr_subset_candidate)
+    new_core_attr_subset_candidate = {"hrtem_system_model_params": \
+                                      hrtem_system_model_params}
+    hrtem_sim_params.update(new_core_attr_subset_candidate)
     prismatique.hrtem.sim.run(sim_params=hrtem_sim_params)
 
     

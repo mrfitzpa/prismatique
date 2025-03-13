@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying the output parameters for STEM simulations.
 
 """
@@ -7,11 +20,6 @@ r"""For specifying the output parameters for STEM simulations.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For general array handling and special math functions.
 import numpy as np
@@ -24,12 +32,8 @@ import czekitout.convert
 # pre-serialization, and de-serialization.
 import fancytypes
 
-# For checking whether certain numbers are approximately zero.
-import emconstants
-
-# For validating, pre-serializing, and de-pre-serializing instances of the
-# class :class:`embeam.stem.probe.ModelParams`.
-import embeam.stem.probe
+# For calculating electron beam wavelengths.
+import embeam
 
 # For calculating the radial range from zero to the largest radial distance
 # within the signal space boundaries.
@@ -62,19 +66,6 @@ import prismatique._signal
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
-
-
-
 ##################################
 ## Define classes and functions ##
 ##################################
@@ -86,95 +77,139 @@ __all__ = ["Params",
 
 
 
-def _check_and_convert_base_params(ctor_params):
-    check_and_convert_base_params = \
-        prismatique.stem.output.base._check_and_convert_base_params
-    base_params = \
-        check_and_convert_base_params(ctor_params)
-    
+def _check_and_convert_base_params(params):
+    module_alias = prismatique.stem.output.base
+    func_alias = module_alias._check_and_convert_base_params
+    base_params = func_alias(params)
+
     return base_params
 
 
 
 def _pre_serialize_base_params(base_params):
-    pre_serialize_base_params = \
-        prismatique.stem.output.base._pre_serialize_base_params
-    serializable_rep = \
-        pre_serialize_base_params(base_params)
+    obj_to_pre_serialize = base_params
+    module_alias = prismatique.stem.output.base
+    func_alias = module_alias._pre_serialize_base_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_base_params(serializable_rep):
-    de_pre_serialize_base_params = \
-        prismatique.stem.output.base._de_pre_serialize_base_params
-    base_params = \
-        de_pre_serialize_base_params(serializable_rep)
+    module_alias = prismatique.stem.output.base
+    func_alias = module_alias._de_pre_serialize_base_params
+    base_params = func_alias(serializable_rep)
 
     return base_params
 
 
 
-def _check_and_convert_alg_specific_params(ctor_params):
-    temp_ctor_params = \
-        {"multislice_output_params": ctor_params["alg_specific_params"]}
-    mod_alias = \
-        prismatique.stem.output
-    
+def _check_and_convert_alg_specific_params(params):
+    current_func_name = "_check_and_convert_alg_specific_params"
+
     try:
-        check_and_convert_multislice_output_params = \
-            mod_alias.multislice._check_and_convert_multislice_output_params
-        alg_specific_params = \
-            check_and_convert_multislice_output_params(temp_ctor_params)
+        module_alias = prismatique.stem.output.multislice
+        func_alias = module_alias._check_and_convert_multislice_output_params
+        kwargs = {"params": \
+                  {"multislice_output_params": params["alg_specific_params"]}}
+        alg_specific_params = func_alias(**kwargs)
     except:
         try:
-            temp_ctor_params = \
-                {"prism_output_params": ctor_params["alg_specific_params"]}
-            check_and_convert_prism_output_params = \
-                mod_alias.prism._check_and_convert_prism_output_params
-            alg_specific_params = \
-                check_and_convert_prism_output_params(temp_ctor_params)
+            module_alias = prismatique.stem.output.prism
+            func_alias = module_alias._check_and_convert_prism_output_params
+            kwargs = {"params": \
+                      {"prism_output_params": params["alg_specific_params"]}}
+            alg_specific_params = func_alias(**kwargs)
         except:
-            raise TypeError(_check_and_convert_alg_specific_params_err_msg_1)
+            err_msg = globals()[current_func_name+"_err_msg_1"]
+            raise TypeError(err_msg)
+
+    alg_specific_params_core_attrs = \
+        alg_specific_params.get_core_attrs(deep_copy=False)
+
+    if (("sample_specification" in params)
+        and ("z_start_output" in alg_specific_params_core_attrs)):
+        sample_specification = \
+            _check_and_convert_sample_specification(params)
+        sample_specification_core_attrs = \
+            sample_specification.get_core_attrs(deep_copy=False)
+        
+        if "thermal_params" in sample_specification_core_attrs:
+            discretization_params = \
+                sample_specification_core_attrs["discretization_params"]
+            discretization_params_core_attrs = \
+                discretization_params.get_core_attrs(deep_copy=False)
+            
+            f_x, f_y = discretization_params_core_attrs["interpolation_factors"]
+        elif "interpolation_factors" in sample_specification_core_attrs:
+            f_x, f_y = sample_specification_core_attrs["interpolation_factors"]
+        else:
+            err_msg = globals()[current_func_name+"_err_msg_2"]
+            raise TypeError(err_msg)
+
+        if ((f_x != 1) or (f_y != 1)):
+            err_msg = globals()[current_func_name+"_err_msg_3"]
+            raise ValueError(err_msg)
     
     return alg_specific_params
 
 
 
-def _pre_serialize_alg_specific_params(alg_specific_params):
-    mod_alias = prismatique.stem.output
+def _check_and_convert_sample_specification(params):
+    params["accepted_types"] = (prismatique.sample.ModelParams,
+                                prismatique.sample.PotentialSliceSubsetIDs,
+                                prismatique.sample.SMatrixSubsetIDs)
 
-    if "z_start_output" in alg_specific_params.core_attrs:
-        pre_serialize_multislice_output_params = \
-            mod_alias.multislice._pre_serialize_multislice_output_params
-        serializable_rep = \
-            pre_serialize_multislice_output_params(alg_specific_params)
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_sample_specification
+    sample_specification = func_alias(params)
+
+    del params["accepted_types"]
+
+    return sample_specification
+
+
+
+def _pre_serialize_alg_specific_params(alg_specific_params):
+    alg_specific_params_core_attrs = \
+        alg_specific_params.get_core_attrs(deep_copy=False)
+
+    if "z_start_output" in alg_specific_params_core_attrs:
+        module_alias = prismatique.stem.output.multislice
+        func_alias = module_alias._pre_serialize_multislice_output_params
+        kwargs = {"multislice_output_params": alg_specific_params}
     else:
-        pre_serialize_prism_output_params = \
-            mod_alias.prism._pre_serialize_prism_output_params
-        serializable_rep = \
-            pre_serialize_prism_output_params(alg_specific_params)
+        module_alias = prismatique.stem.output.prism
+        func_alias = module_alias._pre_serialize_prism_output_params
+        kwargs = {"prism_output_params": alg_specific_params}
+    serializable_rep = func_alias(**kwargs)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_alg_specific_params(serializable_rep):
-    mod_alias = prismatique.stem.output
-
     if "num_slices_per_output" in serializable_rep:
-        de_pre_serialize_multislice_output_params = \
-            mod_alias.multislice._de_pre_serialize_multislice_output_params
-        alg_specific_params = \
-            de_pre_serialize_multislice_output_params(serializable_rep)
+        module_alias = prismatique.stem.output.multislice
+        func_alias = module_alias._de_pre_serialize_multislice_output_params
     else:
-        de_pre_serialize_prism_output_params = \
-            mod_alias.prism._de_pre_serialize_prism_output_params
-        alg_specific_params = \
-            de_pre_serialize_prism_output_params(serializable_rep)
+        module_alias = prismatique.stem.output.prism
+        func_alias = module_alias._de_pre_serialize_prism_output_params
+    alg_specific_params = func_alias(serializable_rep)
 
     return alg_specific_params
+
+
+
+_module_alias = \
+    prismatique.sample
+_default_base_params = \
+    None
+_default_alg_specific_params = \
+    None
+_default_skip_validation_and_conversion = \
+    _module_alias._default_skip_validation_and_conversion
 
 
 
@@ -421,69 +456,215 @@ class Params(fancytypes.PreSerializableAndUpdatable):
         ``alg_specific_params`` is set to `None` [i.e. the default value], then
         the multislice algorithm is used to perform the STEM simulation with the
         aforementioned output parameters set to default values.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"base_params": _check_and_convert_base_params,
-         "alg_specific_params": _check_and_convert_alg_specific_params}
+    ctor_param_names = ("base_params",
+                        "alg_specific_params")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"base_params": _pre_serialize_base_params,
-         "alg_specific_params": _pre_serialize_alg_specific_params}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"base_params": _de_pre_serialize_base_params,
-         "alg_specific_params": _de_pre_serialize_alg_specific_params}
+    
     
     def __init__(self,
-                 base_params=None,
-                 alg_specific_params=None):
-        ctor_params = {"base_params": base_params,
-                       "alg_specific_params": alg_specific_params}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 base_params=\
+                 _default_base_params,
+                 alg_specific_params=\
+                 _default_alg_specific_params,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_output_params(ctor_params):
-    output_params = copy.deepcopy(ctor_params["output_params"])
-    if output_params is None:
-        output_params = Params()
-        
-    kwargs = {"obj": output_params,
-              "obj_name": "output_params",
-              "accepted_types": (Params, type(None))}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
+    
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_output_params(params):
+    obj_name = "output_params"
+    obj = params[obj_name]
+
+    accepted_types = (Params, type(None))
+    
+    if isinstance(obj, accepted_types[-1]):
+        output_params = accepted_types[0]()
+    else:
+        kwargs = {"obj": obj,
+                  "obj_name": obj_name,
+                  "accepted_types": accepted_types}
+        czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+        kwargs = obj.get_core_attrs(deep_copy=False)
+        output_params = accepted_types[0](**kwargs)
+
+    stem_system_model_params = \
+        _check_and_convert_stem_system_model_params(params)
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
+
+    sample_specification = \
+        stem_system_model_params_core_attrs["sample_specification"]
+
+    format_arg = ("stem_system_model_params.core_attrs['sample_specification']"
+                  if ("worker_params" in params)
+                  else "sample_specification")
+
+    kwargs = {"sample_specification": sample_specification,
+              "output_params": output_params,
+              "format_arg": format_arg}
+    _check_compatibility_btwn_sample_specification_and_output_params(**kwargs)
 
     return output_params
 
 
 
-def _pre_serialize_output_params(output_params):
-    serializable_rep = output_params.pre_serialize()
+def _check_compatibility_btwn_sample_specification_and_output_params(
+        sample_specification, output_params, format_arg):
+    sample_specification_core_attrs = \
+        sample_specification.get_core_attrs(deep_copy=False)
 
+    output_params_core_attrs = output_params.get_core_attrs(deep_copy=False)
+    base_output_params = output_params_core_attrs["base_params"]
+    alg_specific_output_params = output_params_core_attrs["alg_specific_params"]
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    save_potential_slices = \
+        base_output_params_core_attrs["save_potential_slices"]
+
+    alg_specific_output_params_core_attrs = \
+        alg_specific_output_params.get_core_attrs(deep_copy=False)
+
+    sample_specification_specifies_a_precalculated_S_matrix_subset = \
+        (not (("thermal_params" in sample_specification_core_attrs)
+              or ("interpolation_factors" in sample_specification_core_attrs)))
+
+    current_func_name = \
+        "_check_compatibility_btwn_sample_specification_and_output_params"
+    
+    if (save_potential_slices
+        and sample_specification_specifies_a_precalculated_S_matrix_subset):
+        unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
+        err_msg = unformatted_err_msg.format(format_arg)
+        raise ValueError(err_msg)
+
+    if "z_start_output" in alg_specific_output_params_core_attrs:
+        try:
+            kwargs = {"params": dict()}
+            kwargs["params"]["sample_specification"] = sample_specification
+            kwargs["params"]["alg_specific_params"] = alg_specific_output_params
+            _check_and_convert_alg_specific_params(**kwargs)
+        except TypeError:
+            unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
+            err_msg = unformatted_err_msg.format(format_arg)
+            raise TypeError(err_msg)
+        except ValueError:
+            unformatted_err_msg = globals()[current_func_name+"_err_msg_3"]
+            err_msg = unformatted_err_msg.format(format_arg)
+            raise ValueError(err_msg)
+
+    return None
+
+
+
+def _pre_serialize_output_params(output_params):
+    obj_to_pre_serialize = output_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_output_params(serializable_rep):
     output_params = Params.de_pre_serialize(serializable_rep)
-
+    
     return output_params
 
 
 
-def layer_depths(sample_specification, alg_specific_params=None):
+_default_output_params = None
+
+
+
+def _check_and_convert_skip_validation_and_conversion(params):
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    return skip_validation_and_conversion
+
+
+
+def layer_depths(sample_specification,
+                 alg_specific_params=\
+                 _default_alg_specific_params,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
     r"""Determine the output layer depths from STEM simulation parameter subset.
 
     For a discussion on output layer depths, see the documentation for the class
@@ -493,7 +674,7 @@ def layer_depths(sample_specification, alg_specific_params=None):
 
     Parameters
     ----------
-    sample_specification : :class:`prismatique.sample.ModelParams` | :class:`prismatique.sample.PotentialSliceSubsetIDs` | :class:`prismatique.sample.SMatrixSubsetIDs` | :class:`prismatique.sample.PotentialSliceAndSMatrixSubsetIDs`
+    sample_specification : :class:`prismatique.sample.ModelParams` | :class:`prismatique.sample.PotentialSliceSubsetIDs` | :class:`prismatique.sample.SMatrixSubsetIDs`
         The simulation parameters specifying the sample model. 
 
         If ``sample_specification`` is of the type
@@ -520,15 +701,14 @@ def layer_depths(sample_specification, alg_specific_params=None):
             + num_slices
 
         Otherwise, if ``sample_specification`` is an instance of the class
-        :class:`prismatique.sample.PotentialSliceSubsetIDs`, the class
-        :class:`prismatique.sample.SMatrixSubsetIDs`, or the class
-        :class:`prismatique.sample.PotentialSliceAndSMatrixSubsetIDs`, then
+        :class:`prismatique.sample.PotentialSliceSubsetIDs`, or the class
+        :class:`prismatique.sample.SMatrixSubsetIDs`, then
         ``sample_specification`` specifies a set of files, where each file
         stores either the pre-calculated potential slices or :math:`S`-matrices
         for a frozen phonon configuration subset. See the documentation for the
         aforementioned classes for further discussions on specifying
         pre-calculated objects. See the documentation for the subpackage
-        :mod:`prismatique.stem` for a discussion on :math:`S`-matrices. 
+        :mod:`prismatique.stem` for a discussion on :math:`S`-matrices.
 
         Moreover, note that ``sample_specification`` must be an instance of the
         class :class:`prismatique.sample.ModelParams`, or the class
@@ -551,6 +731,15 @@ def layer_depths(sample_specification, alg_specific_params=None):
         ``alg_specific_params`` is set to `None` [i.e. the default value], then
         the multislice algorithm is used to perform the STEM simulation with the
         aforementioned output parameters set to default values.
+    skip_validation_and_conversion : `bool`, optional
+        If ``skip_validation_and_conversion`` is set to ``False``, then
+        validations and conversions are performed on the above
+        parameters. 
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``, no
+        validations and conversions are performed on the above parameters. This
+        option is desired primarily when the user wants to avoid potentially
+        expensive validation and/or conversion operations.
 
     Returns
     -------
@@ -564,60 +753,41 @@ def layer_depths(sample_specification, alg_specific_params=None):
         sample's supercell].
 
     """
-    accepted_types = (prismatique.sample.ModelParams,
-                      prismatique.sample.PotentialSliceSubsetIDs,
-                      prismatique.sample.SMatrixSubsetIDs,
-                      prismatique.sample.PotentialSliceAndSMatrixSubsetIDs)
-    prismatique.sample._check_sample_specification(sample_specification,
-                                                   accepted_types)
+    params = locals()
 
-    temp_ctor_params = \
-        {"alg_specific_params": alg_specific_params}
-    alg_specific_params = \
-        _check_and_convert_alg_specific_params(temp_ctor_params)
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
 
-    _check_sample_specification_wrt_alg_specific_params(sample_specification,
-                                                        alg_specific_params)
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
 
-    output_layer_depths = _layer_depths(sample_specification,
-                                        alg_specific_params)
-    
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    output_layer_depths  = _layer_depths(**kwargs)
+
     return output_layer_depths
 
 
 
-def _check_sample_specification_wrt_alg_specific_params(sample_specification,
-                                                        alg_specific_params):
-    if "z_start_output" in alg_specific_params.core_attrs:
-        if "thermal_params" in sample_specification.core_attrs:
-            discretization_params = \
-                sample_specification.core_attrs["discretization_params"]
-            f_x, f_y = \
-                discretization_params.core_attrs["interpolation_factors"]
-        elif "interpolation_factors" in sample_specification.core_attrs:
-            f_x, f_y = sample_specification.core_attrs["interpolation_factors"]
-        else:
-            err_msg = \
-                _check_sample_specification_wrt_alg_specific_params_err_msg_1
-            raise TypeError(err_msg)
-
-        if ((f_x != 1) or (f_y != 1)):
-            err_msg = \
-                _check_sample_specification_wrt_alg_specific_params_err_msg_2
-            raise ValueError(err_msg)
-    
-    return None
-
-
-
 def _layer_depths(sample_specification, alg_specific_params):
+    alg_specific_params_core_attrs = \
+        alg_specific_params.get_core_attrs(deep_copy=False)
+
     multislice_alg_was_specified = \
-        ("z_start_output" in alg_specific_params.core_attrs)
+        ("z_start_output" in alg_specific_params_core_attrs)
     
     if multislice_alg_was_specified:
+        kwargs = \
+            {"sample_specification": sample_specification,
+             "alg_specific_params": alg_specific_params}
         output_layer_depths = \
-            _output_layer_depths_for_multislice_alg(sample_specification,
-                                                    alg_specific_params)
+            _output_layer_depths_for_multislice_alg(**kwargs)
     else:
         output_layer_depths = \
             (prismatique.sample._supercell_dims(sample_specification)[2],)
@@ -637,32 +807,22 @@ def _output_layer_depths_for_multislice_alg(sample_specification,
 
     func_alias = prismatique.sample._z_start_output_passed_to_pyprismatic
     z_start_output = func_alias(sample_specification, alg_specific_params)
+
+    alg_specific_params_core_attrs = \
+        alg_specific_params.get_core_attrs(deep_copy=False)
+    num_slices_per_output = \
+        alg_specific_params_core_attrs["num_slices_per_output"]
     
     z_slice_idx_start_output = \
         max(np.ceil(z_start_output / sample_supercell_slice_thickness)-1, 0)
-    num_slices_per_output = \
-        alg_specific_params.core_attrs["num_slices_per_output"]
 
-    if num_slices_per_output == 0:
-        output_layer_depths = (Delta_Z,)
-        return output_layer_depths
-        
-    total_num_output_layers = \
-        int(total_num_slices / num_slices_per_output)
-    total_num_output_layers += \
-        int(total_num_slices % num_slices_per_output != 0)
-    if z_start_output > 0:
-        total_num_output_layers += \
-            int((z_slice_idx_start_output+1) % num_slices_per_output == 0)
-        total_num_output_layers -= \
-            int((z_slice_idx_start_output+1) / num_slices_per_output)
-
-        output_layer_idx_offset = \
-            int((z_slice_idx_start_output+1) / num_slices_per_output)
-        output_layer_idx_offset += \
-            int((z_slice_idx_start_output+1) % num_slices_per_output != 0)
-    else:
-        output_layer_idx_offset = 1
+    kwargs = \
+        {"total_num_slices": total_num_slices,
+         "num_slices_per_output": num_slices_per_output,
+         "z_start_output": z_start_output,
+         "z_slice_idx_start_output": z_slice_idx_start_output}
+    total_num_output_layers, output_layer_idx_offset = \
+        _total_num_output_layers_and_output_layer_idx_offset(**kwargs)
 
     distance_between_output_layers = \
         num_slices_per_output * sample_supercell_slice_thickness
@@ -681,11 +841,16 @@ def _output_layer_depths_for_multislice_alg(sample_specification,
 
 
 def _total_num_slices(sample_specification):
-    if "discretization_params" in sample_specification.core_attrs:
+    sample_specification_core_attrs = \
+        sample_specification.get_core_attrs(deep_copy=False)
+
+    if "discretization_params" in sample_specification_core_attrs:
         discretization_params = \
-            sample_specification.core_attrs["discretization_params"]
+            sample_specification_core_attrs["discretization_params"]
+        discretization_params_core_attrs = \
+            discretization_params.get_core_attrs(deep_copy=False)
         total_num_slices = \
-            discretization_params.core_attrs["num_slices"]
+            discretization_params_core_attrs["num_slices"]
     else:
         _, _, Delta_Z = \
             prismatique.sample._supercell_dims(sample_specification)
@@ -698,7 +863,45 @@ def _total_num_slices(sample_specification):
 
 
 
-def data_size(stem_system_model_params, output_params=None):
+def _total_num_output_layers_and_output_layer_idx_offset(
+        total_num_slices,
+        num_slices_per_output,
+        z_start_output,
+        z_slice_idx_start_output):
+    total_num_output_layers = \
+        (int(total_num_slices / num_slices_per_output)
+         + int(total_num_slices % num_slices_per_output != 0))
+    if z_start_output > 0:
+        total_num_output_layers += \
+            int((z_slice_idx_start_output+1) % num_slices_per_output == 0)
+        total_num_output_layers -= \
+            int((z_slice_idx_start_output+1) / num_slices_per_output)
+
+        output_layer_idx_offset = \
+            int((z_slice_idx_start_output+1) / num_slices_per_output)
+        output_layer_idx_offset += \
+            int((z_slice_idx_start_output+1) % num_slices_per_output != 0)
+    else:
+        output_layer_idx_offset = 1
+
+    return total_num_output_layers, output_layer_idx_offset
+
+
+
+def _check_and_convert_stem_system_model_params(params):
+    module_alias = prismatique.stem.system
+    func_alias = module_alias._check_and_convert_stem_system_model_params
+    stem_system_model_params = func_alias(params)
+
+    return stem_system_model_params
+
+
+
+def data_size(stem_system_model_params,
+              output_params=\
+              _default_output_params,
+              skip_validation_and_conversion=\
+              _default_skip_validation_and_conversion):
     r"""Calculate the data size of the STEM simulation output that one could
     generate according to a given STEM system model, and output parameter set.
 
@@ -718,6 +921,15 @@ def data_size(stem_system_model_params, output_params=None):
         said parameters. If ``output_params`` is set to `None` [i.e. the default
         value], then the aforementioned simulation parameters are set to default
         values.
+    skip_validation_and_conversion : `bool`, optional
+        If ``skip_validation_and_conversion`` is set to ``False``, then
+        validations and conversions are performed on the above
+        parameters. 
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``, no
+        validations and conversions are performed on the above parameters. This
+        option is desired primarily when the user wants to avoid potentially
+        expensive validation and/or conversion operations.
 
     Returns
     -------
@@ -725,127 +937,74 @@ def data_size(stem_system_model_params, output_params=None):
         The data size in units of bytes.
 
     """
-    stem_system_model_params = \
-        _check_stem_system_model_params(stem_system_model_params)
-    temp_ctor_params = \
-        {"output_params": output_params}
-    output_params = \
-        _check_and_convert_output_params(temp_ctor_params)
+    params = locals()
 
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
 
-    kwargs = {"sample_specification": sample_specification,
-              "output_params": output_params,
-              "format_arg": "sample_specification"}
-    _check_sample_specification_wrt_output_params(**kwargs)
-        
-    output_data_size = _data_size(stem_system_model_params, output_params)
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
+
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    output_data_size  = _data_size(**kwargs)
         
     return output_data_size
 
 
 
-def _check_stem_system_model_params(stem_system_model_params):
-    temp_ctor_params = \
-        {"stem_system_model_params": stem_system_model_params}
-    check_and_convert_stem_system_model_params = \
-        prismatique.stem.system._check_and_convert_stem_system_model_params
-    stem_system_model_params = \
-        check_and_convert_stem_system_model_params(temp_ctor_params)
-
+def _data_size(stem_system_model_params, output_params):
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+        stem_system_model_params_core_attrs["sample_specification"]
     probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+        stem_system_model_params_core_attrs["probe_model_params"]
     scan_config = \
-        stem_system_model_params.core_attrs["scan_config"]
+        stem_system_model_params_core_attrs["scan_config"]
 
-    mod_alias = \
-        prismatique.sample
-    func_alias = \
-        mod_alias._check_and_convert_sample_specification_and_probe_model_params
-    
-    temp_ctor_params = {"sample_specification": sample_specification,
-                        "probe_model_params": probe_model_params}
-    _, _ = func_alias(temp_ctor_params)
+    output_params_core_attrs = output_params.get_core_attrs(deep_copy=False)
+    base_output_params = output_params_core_attrs["base_params"]
+    alg_specific_output_params = output_params_core_attrs["alg_specific_params"]
 
-    kwargs = {"sample_specification": sample_specification,
-              "scan_config": scan_config,
-              "filename": None}
-    _ = prismatique.scan._generate_probe_positions(**kwargs)
-
-    return stem_system_model_params
-
-
-
-def _check_sample_specification_wrt_output_params(sample_specification,
-                                                  output_params,
-                                                  format_arg):
-    sample_specification_specifies_a_precalculated_S_matrix_subset = \
-        (not (("thermal_params" in sample_specification.core_attrs)
-              or ("interpolation_factors" in sample_specification.core_attrs)))
-    
-    base_params = output_params.core_attrs["base_params"]
-    save_potential_slices = base_params.core_attrs["save_potential_slices"]
-    if (save_potential_slices
-        and sample_specification_specifies_a_precalculated_S_matrix_subset):
-        unformatted_err_msg = \
-            _check_sample_specification_wrt_output_params_err_msg_1
-        err_msg = \
-            unformatted_err_msg.format(format_arg)
-        raise ValueError(err_msg)
-
-    alg_specific_params = output_params.core_attrs["alg_specific_params"]
-    if "z_start_output" in alg_specific_params.core_attrs:
-        try:
-            kwargs = {"sample_specification": sample_specification,
-                      "alg_specific_params": alg_specific_params}
-            _check_sample_specification_wrt_alg_specific_params(**kwargs)
-        except TypeError:
-            unformatted_err_msg = \
-                _check_sample_specification_wrt_output_params_err_msg_2
-            err_msg = \
-                unformatted_err_msg.format(format_arg)
-            raise TypeError(err_msg)
-        except ValueError:
-            unformatted_err_msg = \
-                _check_sample_specification_wrt_output_params_err_msg_3
-            err_msg = \
-                unformatted_err_msg.format(format_arg)
-            raise ValueError(err_msg)
-        except BaseException as err:
-            raise err
-    
-    return None
-
-
-
-def _data_size(stem_system_model_params, output_params):    
-    base_output_params = output_params.core_attrs["base_params"]
-    alg_specific_output_params = output_params.core_attrs["alg_specific_params"]
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    alg_specific_output_params_core_attrs = \
+        alg_specific_output_params.get_core_attrs(deep_copy=False)
 
     output_data_size = 0
 
-    kwargs = {"stem_system_model_params": stem_system_model_params,
-              "output_params": output_params}
+    kwargs = {"sample_specification": sample_specification,
+              "alg_specific_output_params": alg_specific_output_params,
+              "scan_config": scan_config,
+              "base_output_params": base_output_params,
+              "probe_model_params": probe_model_params}
     if _intensity_output_is_to_be_saved(base_output_params):
         output_data_size += _data_size_of_intensity_output(**kwargs)
     if _wavefunction_output_is_to_be_saved(base_output_params):
+        del kwargs["base_output_params"]
         output_data_size += _data_size_of_wavefunction_output(**kwargs)
 
+    stem_system_model_params_core_attrs = \
+        stem_system_model_params.get_core_attrs(deep_copy=False)
     sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]    
+        stem_system_model_params_core_attrs["sample_specification"]
+
     kwargs = \
         {"sample_specification": sample_specification}
-
-    if base_output_params.core_attrs["save_potential_slices"]:
+    if base_output_params_core_attrs["save_potential_slices"]:
         output_data_size += \
             prismatique.sample._potential_slice_set_data_size(**kwargs)
-    if "save_S_matrices" in alg_specific_output_params.core_attrs:
-        if alg_specific_output_params.core_attrs["save_S_matrices"]:
+    if "save_S_matrices" in alg_specific_output_params_core_attrs:
+        if alg_specific_output_params_core_attrs["save_S_matrices"]:
             kwargs["probe_model_params"] = \
-                stem_system_model_params.core_attrs["probe_model_params"]
+                stem_system_model_params_core_attrs["probe_model_params"]
             output_data_size += \
                 prismatique.sample._S_matrix_set_data_size(**kwargs)
             
@@ -854,15 +1013,19 @@ def _data_size(stem_system_model_params, output_params):
 
 
 def _intensity_output_is_to_be_saved(base_output_params):
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     radial_step_size_for_3d_stem = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
+        base_output_params_core_attrs["radial_step_size_for_3d_stem"]
     radial_range_for_2d_stem = \
-        base_output_params.core_attrs["radial_range_for_2d_stem"]
+        base_output_params_core_attrs["radial_range_for_2d_stem"]
     cbed_params = \
-        base_output_params.core_attrs["cbed_params"]
+        base_output_params_core_attrs["cbed_params"]
 
-    if (cbed_params.core_attrs["save_final_intensity"]
-        or base_output_params.core_attrs["save_com"]
+    cbed_params_core_attrs = cbed_params.get_core_attrs(deep_copy=False)
+
+    if (cbed_params_core_attrs["save_final_intensity"]
+        or base_output_params_core_attrs["save_com"]
         or (radial_step_size_for_3d_stem > 0)
         or (radial_range_for_2d_stem[0] != radial_range_for_2d_stem[1])):
         intensity_output_is_to_be_saved = True
@@ -874,72 +1037,76 @@ def _intensity_output_is_to_be_saved(base_output_params):
 
 
 def _wavefunction_output_is_to_be_saved(base_output_params):
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     cbed_params = \
-        base_output_params.core_attrs["cbed_params"]
+        base_output_params_core_attrs["cbed_params"]
+
+    cbed_params_core_attrs = \
+        cbed_params.get_core_attrs(deep_copy=False)
     wavefunction_output_is_to_be_saved = \
-        cbed_params.core_attrs["save_wavefunctions"]
+        cbed_params_core_attrs["save_wavefunctions"]
 
     return wavefunction_output_is_to_be_saved
 
 
 
-def _data_size_of_intensity_output(stem_system_model_params, output_params):
-    data_size_of_2d_stem_intensity_output = \
-        _data_size_of_2d_stem_intensity_output(stem_system_model_params,
-                                               output_params)
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-
-    base_output_params = \
-        output_params.core_attrs["base_params"]
-    radial_step_size_for_3d_stem = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
+def _data_size_of_intensity_output(sample_specification,
+                                   alg_specific_output_params,
+                                   scan_config,
+                                   base_output_params,
+                                   probe_model_params):
+    func_alias = _data_size_of_2d_stem_intensity_output
+    kwargs = {"sample_specification": sample_specification,
+              "alg_specific_output_params": alg_specific_output_params,
+              "scan_config": scan_config}
+    data_size_of_2d_stem_intensity_output = func_alias(**kwargs)
+    
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
     radial_range_for_2d_stem = \
-        base_output_params.core_attrs["radial_range_for_2d_stem"]
+        base_output_params_core_attrs["radial_range_for_2d_stem"]
+    save_com = \
+        base_output_params_core_attrs["save_com"]
+    radial_step_size_for_3d_stem = \
+        base_output_params_core_attrs["radial_step_size_for_3d_stem"]
     cbed_params = \
-        base_output_params.core_attrs["cbed_params"]
+        base_output_params_core_attrs["cbed_params"]
+
+    cbed_params_core_attrs = cbed_params.get_core_attrs(deep_copy=False)
+    save_final_intensity = cbed_params_core_attrs["save_final_intensity"]
+    postprocessing_seq = cbed_params_core_attrs["postprocessing_seq"]
 
     data_size_of_intensity_output = 0
     if radial_range_for_2d_stem[0] != radial_range_for_2d_stem[1]:
-        data_size_of_intensity_output += data_size_of_2d_stem_intensity_output
-    if base_output_params.core_attrs["save_com"]:
-        data_size_of_intensity_output += 2*data_size_of_2d_stem_intensity_output
-    if cbed_params.core_attrs["save_final_intensity"]:
-        kwargs = \
-            {"sample_specification": sample_specification,
-             "signal_is_cbed_pattern_set": True,
-             "postprocessing_seq": cbed_params.core_attrs["postprocessing_seq"]}
-        num_pixels_in_postprocessed_2d_signal_space = \
-            prismatique._signal._num_pixels_in_postprocessed_2d_signal_space
-        num_pixels_in_postprocessed_dp = \
-            num_pixels_in_postprocessed_2d_signal_space(**kwargs)
-        data_size_of_intensity_output += \
-            (data_size_of_2d_stem_intensity_output
-             * num_pixels_in_postprocessed_dp)
+        data_size_of_intensity_output += 1
+    if save_com:
+        data_size_of_intensity_output += 2
+    if save_final_intensity:
+        module_alias = prismatique._signal
+        func_alias = module_alias._num_pixels_in_postprocessed_2d_signal_space
+        kwargs = {"sample_specification": sample_specification,
+                  "signal_is_cbed_pattern_set": True,
+                  "postprocessing_seq": postprocessing_seq}
+        data_size_of_intensity_output += func_alias(**kwargs)
     if radial_step_size_for_3d_stem > 0:
-        kwargs = \
-            {"stem_system_model_params": stem_system_model_params,
-             "output_params": output_params}
-        num_pixels_in_3d_stem_integrated_dp = \
-            _num_pixels_in_3d_stem_integrated_dp(**kwargs)
-        data_size_of_intensity_output += \
-            (data_size_of_2d_stem_intensity_output
-             * num_pixels_in_3d_stem_integrated_dp)
+        func_alias = _num_pixels_in_3d_stem_integrated_dp
+        kwargs = {"base_output_params": base_output_params,
+                  "sample_specification": sample_specification,
+                  "probe_model_params": probe_model_params}
+        data_size_of_intensity_output += func_alias(**kwargs)
+    data_size_of_intensity_output *= data_size_of_2d_stem_intensity_output
 
     return data_size_of_intensity_output
 
 
 
-def _data_size_of_2d_stem_intensity_output(stem_system_model_params,
-                                           output_params):
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-    scan_config = \
-        stem_system_model_params.core_attrs["scan_config"]
-
-    alg_specific_params = output_params.core_attrs["alg_specific_params"]
-    output_layer_depths = _layer_depths(sample_specification,
-                                        alg_specific_params)
+def _data_size_of_2d_stem_intensity_output(sample_specification,
+                                           alg_specific_output_params,
+                                           scan_config):
+    kwargs = {"sample_specification": sample_specification,
+              "alg_specific_params": alg_specific_output_params}
+    output_layer_depths = _layer_depths(**kwargs)
 
     kwargs = {"sample_specification": sample_specification,
               "scan_config": scan_config,
@@ -956,14 +1123,16 @@ def _data_size_of_2d_stem_intensity_output(stem_system_model_params,
 
 
 
-def _num_pixels_in_3d_stem_integrated_dp(stem_system_model_params,
-                                         output_params):
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
+def _num_pixels_in_3d_stem_integrated_dp(base_output_params,
+                                         sample_specification,
+                                         probe_model_params):
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    cbed_params = \
+        base_output_params_core_attrs["cbed_params"]
 
-    base_output_params = output_params.core_attrs["base_params"]
-    cbed_params = base_output_params.core_attrs["cbed_params"]
-    postprocessing_seq = cbed_params.core_attrs["postprocessing_seq"]
+    cbed_params_core_attrs = cbed_params.get_core_attrs(deep_copy=False)
+    postprocessing_seq = cbed_params_core_attrs["postprocessing_seq"]
 
     kwargs = \
         {"sample_specification": sample_specification,
@@ -974,42 +1143,42 @@ def _num_pixels_in_3d_stem_integrated_dp(stem_system_model_params,
     blank_postprocessed_dp_signal = \
         prismatique._signal._blank_postprocessed_2d_signal(**kwargs)
 
+    kwargs = \
+        {"probe_model_params": probe_model_params,
+         "base_output_params": base_output_params,
+         "input_signal": blank_postprocessed_dp_signal}
     num_pixels_in_3d_stem_integrated_dp = \
-        _num_bins_in_3d_stem_integration(stem_system_model_params,
-                                         output_params,
-                                         blank_postprocessed_dp_signal)
+        _num_bins_in_3d_stem_integration(**kwargs)
     
     return num_pixels_in_3d_stem_integrated_dp
 
 
 
-def _num_bins_in_3d_stem_integration(stem_system_model_params,
-                                     output_params,
+def _num_bins_in_3d_stem_integration(probe_model_params,
+                                     base_output_params,
                                      input_signal):
-    probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
+    probe_model_params_core_attrs = \
+        probe_model_params.get_core_attrs(deep_copy=False)
     gun_model_params = \
-        probe_model_params.core_attrs["gun_model_params"]
-    mean_beam_energy = \
-        gun_model_params.core_attrs["mean_beam_energy"]
-    wavelength = \
-        embeam.wavelength(mean_beam_energy)
-    
-    base_output_params = \
-        output_params.core_attrs["base_params"]
-    radial_angular_step_size = \
-        base_output_params.core_attrs["radial_step_size_for_3d_stem"]
-    radial_k_step_size = \
-        (radial_angular_step_size / 1000) / wavelength
+        probe_model_params_core_attrs["gun_model_params"]
 
-    # The following code block calculates the radial range from zero to the
+    gun_model_params_core_attrs = \
+        gun_model_params.get_core_attrs(deep_copy=False)
+    mean_beam_energy = \
+        gun_model_params_core_attrs["mean_beam_energy"]
+    
+    wavelength = embeam.wavelength(mean_beam_energy)
+
+    base_output_params_core_attrs = \
+        base_output_params.get_core_attrs(deep_copy=False)
+    radial_angular_step_size = \
+        base_output_params_core_attrs["radial_step_size_for_3d_stem"]
+
+    radial_k_step_size = (radial_angular_step_size / 1000) / wavelength
+
+    # The following line of code calculates the radial range from zero to the
     # largest radial distance within the signal space boundaries.
-    kwargs = \
-        {"radial_range": None,
-         "signal": input_signal,
-         "center": (0, 0)}
-    radial_k_range = \
-        np.array(empix._check_and_convert_radial_range_v2(**kwargs)) / 1000
+    radial_k_range = _radial_k_range(input_signal)
 
     num_bins = int(np.floor(2 * radial_k_range[1] / radial_k_step_size))
 
@@ -1017,20 +1186,33 @@ def _num_bins_in_3d_stem_integration(stem_system_model_params,
 
 
 
-def _data_size_of_wavefunction_output(stem_system_model_params, output_params):
-    sample_specification = \
-        stem_system_model_params.core_attrs["sample_specification"]
-    probe_model_params = \
-        stem_system_model_params.core_attrs["probe_model_params"]
-    scan_config = \
-        stem_system_model_params.core_attrs["scan_config"]
+def _radial_k_range(input_signal):
+    obj_name = "radial_range"
+    module_alias = empix
+    cls_alias = module_alias.OptionalAzimuthalAveragingParams
+    func_alias = cls_alias.get_validation_and_conversion_funcs()[obj_name]
 
+    params = {"radial_range": None,
+              "input_signal": input_signal,
+              "center": (0, 0)}
+    radial_k_range = np.array(func_alias(params))
+
+    return radial_k_range
+
+
+
+def _data_size_of_wavefunction_output(probe_model_params,
+                                      alg_specific_output_params,
+                                      sample_specification,
+                                      scan_config):
+    probe_model_params_core_attrs = \
+        probe_model_params.get_core_attrs(deep_copy=False)
     defocal_offset_supersampling = \
-        probe_model_params.core_attrs["defocal_offset_supersampling"]
+        probe_model_params_core_attrs["defocal_offset_supersampling"]
 
-    alg_specific_params = output_params.core_attrs["alg_specific_params"]
-    output_layer_depths = _layer_depths(sample_specification,
-                                        alg_specific_params)
+    kwargs = {"sample_specification": sample_specification,
+              "alg_specific_params": alg_specific_output_params}
+    output_layer_depths = _layer_depths(**kwargs)
 
     kwargs = \
         {"sample_specification": sample_specification}
@@ -1070,32 +1252,31 @@ _check_and_convert_alg_specific_params_err_msg_1 = \
     ("The object ``alg_specific_params`` must be an instance of one of the "
      "following classes: (`prismatique.stem.output.multislice.Params`, "
      "`prismatique.stem.output.prism.Params`, `NoneType`).")
-
-_check_sample_specification_wrt_alg_specific_params_err_msg_1 = \
+_check_and_convert_alg_specific_params_err_msg_2 = \
     ("The object ``sample_specification`` must be an instance of the class "
      "`prismatique.sample.ModelParams`, or the class "
      "`prismatique.sample.PotentialSliceSubsetIDs` when the parameter "
      "``alg_specific_params`` is set to `None`, or is an instance of the class "
      ":class:`prismatique.stem.output.multislice.Params`.")
-_check_sample_specification_wrt_alg_specific_params_err_msg_2 = \
+_check_and_convert_alg_specific_params_err_msg_3 = \
     ("The object "
      "``sample_specification`` must specify that the interpolation factors "
      "be set to unity when the parameter ``alg_specific_params`` is set to "
      "`None`, or is an instance of the class "
      ":class:`prismatique.stem.output.multislice.Params`.")
 
-_check_sample_specification_wrt_output_params_err_msg_1 = \
+_check_compatibility_btwn_sample_specification_and_output_params_err_msg_1 = \
     ("The object ``{}`` must be an instance of the class "
      "`prismatique.sample.ModelParams`, or the class "
      "`prismatique.sample.PotentialSliceSubsetIDs` when specifying that the "
      "potential slices to be used in the simulation are to be saved as output.")
-_check_sample_specification_wrt_output_params_err_msg_2 = \
+_check_compatibility_btwn_sample_specification_and_output_params_err_msg_2 = \
     ("The object ``{}`` must be an instance of the class "
      "`prismatique.sample.ModelParams`, or the class "
      "`prismatique.sample.PotentialSliceSubsetIDs` when specifying that the "
      "multislice algorithm is to be used, as is implied by the object "
      "``output_params``.")
-_check_sample_specification_wrt_output_params_err_msg_3 = \
+_check_compatibility_btwn_sample_specification_and_output_params_err_msg_3 = \
     ("The object ``{}`` must specify that the interpolation factors be set to "
      "unity when also specifying that the multislice algorithm is to be used, "
      "as is implied by the object ``output_params``.")

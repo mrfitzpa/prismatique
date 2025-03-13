@@ -42,7 +42,7 @@ keywords = [
 ]
 dependencies = [
     "embeam",
-    "pyprismatic"
+    "h5pywrappers"
 ]
 requires-python = ">=3.8"
 

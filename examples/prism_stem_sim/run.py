@@ -1,7 +1,20 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 """An example of running a STEM simulation that uses the PRISM algorithm.
 
 See the link
-https://mrfitzpa.gitlab.io/prismatique/examples/prism-stem-sim/run.html for a
+https://mrfitzpa.github.io/prismatique/examples/prism-stem-sim/run.html for a
 description of the example.
 
 A NOTE BEFORE STARTING
@@ -43,16 +56,15 @@ import prismatique
 
 
 
-############################
-## Authorship information ##
-############################
+###############################################
+## Define classes, functions, and contstants ##
+###############################################
 
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
+
+
+###########################
+## Define error messages ##
+###########################
 
 
 
@@ -89,8 +101,8 @@ for try_count in range(2):
         atomic_coords_filename = \
             sample_specification.core_attrs["atomic_coords_filename"]
 
-        mod_alias = prismatique.sample
-        mod_alias.check_atomic_coords_file_format(atomic_coords_filename)
+        module_alias = prismatique.sample
+        module_alias.check_atomic_coords_file_format(atomic_coords_filename)
 
         break  # No exceptions raised, hence we can exit the for-loop early.
 
@@ -148,10 +160,12 @@ try:
     # the STEM simulation. See the documentation for the function
     # :func:`prismatique.stem.sim.run` for a discussion on the input parameters
     # of said function.
-    core_attr_subset = {"sample_specification": sample_specification}
-    stem_system_model_params.update(core_attr_subset)
-    core_attr_subset = {"stem_system_model_params": stem_system_model_params}
-    prism_stem_sim_params.update(core_attr_subset)
+    new_core_attr_subset_candidate = {"sample_specification": \
+                                      sample_specification}
+    stem_system_model_params.update(new_core_attr_subset_candidate)
+    new_core_attr_subset_candidate = {"stem_system_model_params": \
+                                      stem_system_model_params}
+    prism_stem_sim_params.update(new_core_attr_subset_candidate)
 
     msg = "Running the STEM simulation for the MoS2 sample..."
     print(msg)
@@ -161,10 +175,12 @@ try:
 except:
     # Could not find valid S-matrices to load, hence we perform the STEM
     # simulation from scratch using the sample model parameters.
-    core_attr_subset = {"sample_specification": sample_model_params}
-    stem_system_model_params.update(core_attr_subset)
-    core_attr_subset = {"stem_system_model_params": stem_system_model_params}
-    prism_stem_sim_params.update(core_attr_subset)
+    new_core_attr_subset_candidate = {"sample_specification": \
+                                      sample_model_params}
+    stem_system_model_params.update(new_core_attr_subset_candidate)
+    new_core_attr_subset_candidate = {"stem_system_model_params": \
+                                      stem_system_model_params}
+    prism_stem_sim_params.update(new_core_attr_subset_candidate)
     prismatique.stem.sim.run(sim_params=prism_stem_sim_params)
 
     

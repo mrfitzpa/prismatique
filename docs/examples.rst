@@ -17,4 +17,3 @@ that they can see all the different features that have been implemented in
    examples/multislice_stem_sim/run.rst
    examples/prism_stem_sim/run.rst
    examples/hrtem_sim/run.rst
-   examples/minimal_slurm_job_submission.rst

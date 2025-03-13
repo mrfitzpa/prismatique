@@ -116,7 +116,7 @@ def _de_pre_serialize_postprocessing_seq(serializable_rep):
             cls_alias = empix.OptionalResamplingParams
             
         postprocessing_step = \
-            cls_alias.de_pre_serialize(serialized_postprocessing_step)
+            cls_alias.de_pre_serialize(elem_of_serializable_rep)
         postprocessing_seq += \
             (postprocessing_step,)
 
@@ -131,7 +131,6 @@ def _blank_unprocessed_2d_signal(sample_specification,
     kwargs = {"sample_specification": sample_specification,
               "signal_is_cbed_pattern_set": signal_is_cbed_pattern_set}
     signal_space_axes = _signal_space_axes_of_unprocessed_2d_signal(**kwargs)
-
     
     signal_shape = (navigation_dims
                     + (signal_space_axes[1].size, signal_space_axes[0].size))
@@ -152,25 +151,21 @@ def _blank_unprocessed_2d_signal(sample_specification,
 
 
 
-def _generate_signal_space_axes_of_unprocessed_2d_signal(
+def _signal_space_axes_of_unprocessed_2d_signal(
         sample_specification,
         signal_is_cbed_pattern_set):
-    func_alias = (_generate_k_x_and_k_y_axes_of_unprocessed_dp_signal
+    func_alias = (_k_x_and_k_y_axes_of_unprocessed_dp_signal
                   if signal_is_cbed_pattern_set
-                  else _generate_r_x_and_r_y_axes_of_unprocessed_image_signal)
+                  else _r_x_and_r_y_axes_of_unprocessed_image_signal)
     signal_space_axes = func_alias(sample_specification)
 
     return signal_space_axes
 
 
 
-_tol_for_comparing_floats = 10*np.finfo(np.float32).eps
-
-
-
-def _generate_k_x_and_k_y_axes_of_unprocessed_dp_signal(sample_specification):
+def _k_x_and_k_y_axes_of_unprocessed_dp_signal(sample_specification):
     k_x, k_y = \
-        _generate_k_x_and_k_y_of_unprocessed_dp_signal(sample_specification)
+        _k_x_and_k_y_of_unprocessed_dp_signal(sample_specification)
 
     axes_labels = (r"$k_x$", r"$k_y$")
     sizes = (len(k_x), len(k_y))
@@ -178,8 +173,10 @@ def _generate_k_x_and_k_y_axes_of_unprocessed_dp_signal(sample_specification):
     offsets = (k_x[0], k_y[0])
     units = ("1/Å", "1/Å")
 
+    tol = 10*np.finfo(np.float32).eps
+
     scales = ((scales[0], -scales[0])
-              if (abs(scales[0]+scales[1]) < _tol_for_comparing_floats)
+              if (abs(scales[0]+scales[1]) < tol)
               else scales)
     
     k_x_and_k_y_axes = tuple()
@@ -196,23 +193,23 @@ def _generate_k_x_and_k_y_axes_of_unprocessed_dp_signal(sample_specification):
 
 
 
-def _generate_k_x_and_k_y_of_unprocessed_dp_signal(sample_specification):
-    mod_alias = \
+def _k_x_and_k_y_of_unprocessed_dp_signal(sample_specification):
+    module_alias = \
         prismatique.sample
     kwargs = \
         {"sample_specification": sample_specification}
     sample_supercell_xy_dims_in_pixels = \
-        mod_alias._supercell_xy_dims_in_pixels(**kwargs)
+        module_alias._supercell_xy_dims_in_pixels(**kwargs)
     sample_supercell_lateral_pixel_size = \
-        mod_alias._supercell_lateral_pixel_size(**kwargs)
+        module_alias._supercell_lateral_pixel_size(**kwargs)
     f_x, f_y = \
-        mod_alias._interpolation_factors_from_sample_specification(**kwargs)
+        module_alias._interpolation_factors_from_sample_specification(**kwargs)
 
     # Fourier coordinates before anti-aliasing crop.
-    k_x = mod_alias._FFT_1D_freqs(sample_supercell_xy_dims_in_pixels[0],
-                                  sample_supercell_lateral_pixel_size[0])
-    k_y = mod_alias._FFT_1D_freqs(sample_supercell_xy_dims_in_pixels[1],
-                                  sample_supercell_lateral_pixel_size[1])
+    k_x = module_alias._FFT_1D_freqs(sample_supercell_xy_dims_in_pixels[0],
+                                     sample_supercell_lateral_pixel_size[0])
+    k_y = module_alias._FFT_1D_freqs(sample_supercell_xy_dims_in_pixels[1],
+                                     sample_supercell_lateral_pixel_size[1])
 
     # Fourier coordinates after anti-aliasing crop.
     N_x = len(k_x)
@@ -232,10 +229,8 @@ def _generate_k_x_and_k_y_of_unprocessed_dp_signal(sample_specification):
 
 
 
-def _generate_r_x_and_r_y_axes_of_unprocessed_image_signal(
-        sample_specification):
-    r_x, r_y = \
-        _generate_r_x_and_r_y_of_unprocessed_image_signal(sample_specification)
+def _r_x_and_r_y_axes_of_unprocessed_image_signal(sample_specification):
+    r_x, r_y = _r_x_and_r_y_of_unprocessed_image_signal(sample_specification)
 
     axes_labels = (r"$x$", r"$y$")
     sizes = (len(r_x), len(r_y))
@@ -243,8 +238,10 @@ def _generate_r_x_and_r_y_axes_of_unprocessed_image_signal(
     offsets = (r_x[0], r_y[0])
     units = ("Å", "Å")
 
+    tol = 10*np.finfo(np.float32).eps
+
     scales = ((scales[0], -scales[0])
-              if (abs(scales[0]+scales[1]) < _tol_for_comparing_floats)
+              if (abs(scales[0]+scales[1]) < tol)
               else scales)
 
     r_x_and_r_y_axes = tuple()
@@ -261,7 +258,7 @@ def _generate_r_x_and_r_y_axes_of_unprocessed_image_signal(
 
 
 
-def _generate_r_x_and_r_y_of_unprocessed_image_signal(sample_specification):
+def _r_x_and_r_y_of_unprocessed_image_signal(sample_specification):
     kwargs = \
         {"sample_specification": sample_specification}
     N_x, N_y = \
@@ -282,7 +279,7 @@ def _generate_r_x_and_r_y_of_unprocessed_image_signal(sample_specification):
 
 
 
-def _calc_num_pixels_in_postprocessed_2d_signal_space(
+def _num_pixels_in_postprocessed_2d_signal_space(
         sample_specification,
         signal_is_cbed_pattern_set,
         postprocessing_seq):
@@ -349,8 +346,8 @@ def _postprocess_2d_signal(input_signal, postprocessing_seq):
 
 
 
-def _calc_num_pixels_in_unprocessed_2d_signal_space(sample_specification,
-                                                    signal_is_cbed_pattern_set):
+def _num_pixels_in_unprocessed_2d_signal_space(sample_specification,
+                                               signal_is_cbed_pattern_set):
     kwargs = {"sample_specification": sample_specification,
               "navigation_dims": tuple(),
               "signal_is_cbed_pattern_set": signal_is_cbed_pattern_set,

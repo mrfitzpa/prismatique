@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# Copyright 2024 Matthew Fitzpatrick.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 r"""For specifying simulation parameters related to the modelling of HRTEM
 systems.
 
@@ -8,11 +21,6 @@ systems.
 #####################################
 ## Load libraries/packages/modules ##
 #####################################
-
-# For performing deep copies of objects.
-import copy
-
-
 
 # For validating and converting objects.
 import czekitout.check
@@ -40,19 +48,6 @@ import prismatique.aperture
 
 
 
-############################
-## Authorship information ##
-############################
-
-__author__     = "Matthew Fitzpatrick"
-__copyright__  = "Copyright 2023"
-__credits__    = ["Matthew Fitzpatrick"]
-__maintainer__ = "Matthew Fitzpatrick"
-__email__      = "mrfitzpa@uvic.ca"
-__status__     = "Development"
-
-
-
 ##################################
 ## Define classes and functions ##
 ##################################
@@ -62,172 +57,174 @@ __all__ = ["Params"]
 
 
 
-def _check_and_convert_sample_specification(ctor_params):
-    sample_specification = copy.deepcopy(ctor_params["sample_specification"])
-    
-    accepted_types = (prismatique.sample.ModelParams,
-                      prismatique.sample.PotentialSliceSubsetIDs)
-    kwargs = {"obj": sample_specification,
-              "obj_name": "sample_specification",
-              "accepted_types": accepted_types}
-    czekitout.check.if_instance_of_any_accepted_types(**kwargs)
-    
+def _check_and_convert_sample_specification(params):
+    params["accepted_types"] = (prismatique.sample.ModelParams,
+                                prismatique.sample.PotentialSliceSubsetIDs)
+
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_sample_specification
+    sample_specification = func_alias(params)
+
+    del params["accepted_types"]
+
     return sample_specification
 
 
 
 def _pre_serialize_sample_specification(sample_specification):
-    if "thermal_params" in sample_specification.core_attrs:
-        pre_serialize_sample_specification = \
-            prismatique.sample._pre_serialize_sample_model_params
-    else:
-        pre_serialize_sample_specification = \
-            prismatique.sample._pre_serialize_potential_slice_subset_ids
-        
-    serializable_rep = pre_serialize_sample_specification(sample_specification)
-
+    obj_to_pre_serialize = sample_specification
+    module_alias = prismatique.sample
+    func_alias = module_alias._pre_serialize_sample_specification
+    serializable_rep = func_alias(obj_to_pre_serialize)
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_sample_specification(serializable_rep):
-    if "thermal_params" in serializable_rep:
-        de_pre_serialize_sample_specification = \
-            prismatique.sample._de_pre_serialize_sample_model_params
-    else:
-        de_pre_serialize_sample_specification = \
-            prismatique.sample._de_pre_serialize_potential_slice_subset_ids
-        
-    sample_specification = \
-        de_pre_serialize_sample_specification(serializable_rep)
+    module_alias = prismatique.sample
+    func_alias = module_alias._de_pre_serialize_sample_specification
+    sample_specification = func_alias(serializable_rep)
 
     return sample_specification
 
 
 
-def _check_and_convert_gun_model_params(ctor_params):
-    check_and_convert_gun_model_params = \
-        embeam.gun._check_and_convert_gun_model_params
-    gun_model_params = \
-        check_and_convert_gun_model_params(ctor_params)
+def _check_and_convert_gun_model_params(params):
+    obj_name = "gun_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_validation_and_conversion_funcs()[obj_name]
+    gun_model_params = func_alias(params)
     
     return gun_model_params
 
 
 
 def _pre_serialize_gun_model_params(gun_model_params):
-    pre_serialize_gun_model_params = \
-        embeam.gun._pre_serialize_gun_model_params
-    serializable_rep = \
-        pre_serialize_gun_model_params(gun_model_params)
+    obj_to_pre_serialize = gun_model_params
 
+    obj_name = "gun_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_pre_serialization_funcs()[obj_name]
+    serializable_rep = func_alias(obj_to_pre_serialize)
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_gun_model_params(serializable_rep):
-    de_pre_serialize_gun_model_params = \
-        embeam.gun._de_pre_serialize_gun_model_params
-    gun_model_params = \
-        de_pre_serialize_gun_model_params(serializable_rep)
+    obj_name = "gun_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_de_pre_serialization_funcs()[obj_name]
+    gun_model_params = func_alias(serializable_rep)
 
     return gun_model_params
 
 
 
-def _check_and_convert_lens_model_params(ctor_params):
-    check_and_convert_lens_model_params = \
-        embeam.lens._check_and_convert_lens_model_params
-    lens_model_params = \
-        check_and_convert_lens_model_params(ctor_params)
+def _check_and_convert_lens_model_params(params):
+    obj_name = "lens_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_validation_and_conversion_funcs()[obj_name]
+    lens_model_params = func_alias(params)
     
     return lens_model_params
 
 
 
 def _pre_serialize_lens_model_params(lens_model_params):
-    pre_serialize_lens_model_params = \
-        embeam.lens._pre_serialize_lens_model_params
-    serializable_rep = \
-        pre_serialize_lens_model_params(lens_model_params)
+    obj_to_pre_serialize = lens_model_params
 
+    obj_name = "lens_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_pre_serialization_funcs()[obj_name]
+    serializable_rep = func_alias(obj_to_pre_serialize)
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_lens_model_params(serializable_rep):
-    de_pre_serialize_lens_model_params = \
-        embeam.lens._de_pre_serialize_lens_model_params
-    lens_model_params = \
-        de_pre_serialize_lens_model_params(serializable_rep)
+    obj_name = "lens_model_params"
+
+    module_alias = embeam.stem.probe
+    cls_alias = module_alias.ModelParams
+    func_alias = cls_alias.get_de_pre_serialization_funcs()[obj_name]
+    lens_model_params = func_alias(serializable_rep)
 
     return lens_model_params
 
 
 
-def _check_and_convert_tilt_params(ctor_params):
-    check_and_convert_tilt_params = \
-        prismatique.tilt._check_and_convert_tilt_params
-    tilt_params = \
-        check_and_convert_tilt_params(ctor_params)
+def _check_and_convert_tilt_params(params):
+    module_alias = prismatique.tilt
+    func_alias = module_alias._check_and_convert_tilt_params
+    tilt_params = func_alias(params)
     
     return tilt_params
 
 
 
 def _pre_serialize_tilt_params(tilt_params):
-    pre_serialize_tilt_params = \
-        prismatique.tilt._pre_serialize_tilt_params
-    serializable_rep = \
-        pre_serialize_tilt_params(tilt_params)
+    obj_to_pre_serialize = tilt_params
+    module_alias = prismatique.tilt
+    func_alias = module_alias._pre_serialize_tilt_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_tilt_params(serializable_rep):
-    de_pre_serialize_tilt_params = \
-        prismatique.tilt._de_pre_serialize_tilt_params
-    tilt_params = \
-        de_pre_serialize_tilt_params(serializable_rep)
+    module_alias = prismatique.tilt
+    func_alias = module_alias._de_pre_serialize_tilt_params
+    tilt_params = func_alias(serializable_rep)
 
     return tilt_params
 
 
 
-def _check_and_convert_objective_aperture_params(ctor_params):
-    check_and_convert_objective_aperture_params = \
-        prismatique.aperture._check_and_convert_objective_aperture_params
-    objective_aperture_params = \
-        check_and_convert_objective_aperture_params(ctor_params)
+def _check_and_convert_objective_aperture_params(params):
+    module_alias = prismatique.aperture
+    func_alias = module_alias._check_and_convert_objective_aperture_params
+    objective_aperture_params = func_alias(params)
     
     return objective_aperture_params
 
 
 
 def _pre_serialize_objective_aperture_params(objective_aperture_params):
-    pre_serialize_objective_aperture_params = \
-        prismatique.aperture._pre_serialize_objective_aperture_params
-    serializable_rep = \
-        pre_serialize_objective_aperture_params(objective_aperture_params)
+    obj_to_pre_serialize = objective_aperture_params
+    module_alias = prismatique.aperture
+    func_alias = module_alias._pre_serialize_objective_aperture_params
+    serializable_rep = func_alias(obj_to_pre_serialize)
 
     return serializable_rep
 
 
 
 def _de_pre_serialize_objective_aperture_params(serializable_rep):
-    de_pre_serialize_objective_aperture_params = \
-        prismatique.aperture._de_pre_serialize_objective_aperture_params
-    objective_aperture_params = \
-        de_pre_serialize_objective_aperture_params(serializable_rep)
+    module_alias = prismatique.aperture
+    func_alias = module_alias._de_pre_serialize_objective_aperture_params
+    objective_aperture_params = func_alias(serializable_rep)
 
     return objective_aperture_params
 
 
 
-def _check_and_convert_defocal_offset_supersampling(ctor_params):
-    kwargs = {"obj": ctor_params["defocal_offset_supersampling"],
-              "obj_name": "defocal_offset_supersampling"}
+def _check_and_convert_defocal_offset_supersampling(params):
+    obj_name = "defocal_offset_supersampling"
+    kwargs = {"obj": params[obj_name], "obj_name": obj_name}
     defocal_offset_supersampling = czekitout.convert.to_positive_int(**kwargs)
 
     return defocal_offset_supersampling
@@ -235,7 +232,8 @@ def _check_and_convert_defocal_offset_supersampling(ctor_params):
 
 
 def _pre_serialize_defocal_offset_supersampling(defocal_offset_supersampling):
-    serializable_rep = defocal_offset_supersampling
+    obj_to_pre_serialize = defocal_offset_supersampling
+    serializable_rep = obj_to_pre_serialize
     
     return serializable_rep
 
@@ -245,6 +243,25 @@ def _de_pre_serialize_defocal_offset_supersampling(serializable_rep):
     defocal_offset_supersampling = serializable_rep
 
     return defocal_offset_supersampling
+
+
+
+_module_alias_1 = \
+    prismatique.tilt
+_module_alias_2 = \
+    prismatique.aperture
+_default_gun_model_params = \
+    None
+_default_lens_model_params = \
+    None
+_default_tilt_params = \
+    _module_alias_1._default_tilt_params
+_default_objective_aperture_params = \
+    _module_alias_2._default_objective_aperture_params
+_default_defocal_offset_supersampling = \
+    9
+_default_skip_validation_and_conversion = \
+    _module_alias_2._default_skip_validation_and_conversion
 
 
 
@@ -303,90 +320,148 @@ class ModelParams(fancytypes.PreSerializableAndUpdatable):
         :math:`\delta_{f}` in
         Eq. :eq:`mixed_state_operator_for_transmitted_electron`. Must be
         positive.
+    skip_validation_and_conversion : `bool`, optional
+        Let ``validation_and_conversion_funcs`` and ``core_attrs`` denote the
+        attributes :attr:`~fancytypes.Checkable.validation_and_conversion_funcs`
+        and :attr:`~fancytypes.Checkable.core_attrs` respectively, both of which
+        being `dict` objects.
 
-    Attributes
-    ----------
-    core_attrs : `dict`, read-only
-        A `dict` representation of the core attributes: each `dict` key is a
-        `str` representing the name of a core attribute, and the corresponding
-        `dict` value is the object to which said core attribute is set. The core
-        attributes are the same as the construction parameters, except that 
-        their values might have been updated since construction.
+        Let ``params_to_be_mapped_to_core_attrs`` denote the `dict`
+        representation of the constructor parameters excluding the parameter
+        ``skip_validation_and_conversion``, where each `dict` key ``key`` is a
+        different constructor parameter name, excluding the name
+        ``"skip_validation_and_conversion"``, and
+        ``params_to_be_mapped_to_core_attrs[key]`` would yield the value of the
+        constructor parameter with the name given by ``key``.
+
+        If ``skip_validation_and_conversion`` is set to ``False``, then for each
+        key ``key`` in ``params_to_be_mapped_to_core_attrs``,
+        ``core_attrs[key]`` is set to ``validation_and_conversion_funcs[key]
+        (params_to_be_mapped_to_core_attrs)``.
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``,
+        then ``core_attrs`` is set to
+        ``params_to_be_mapped_to_core_attrs.copy()``. This option is desired
+        primarily when the user wants to avoid potentially expensive deep copies
+        and/or conversions of the `dict` values of
+        ``params_to_be_mapped_to_core_attrs``, as it is guaranteed that no
+        copies or conversions are made in this case.
 
     """
-    _validation_and_conversion_funcs = \
-        {"sample_specification": _check_and_convert_sample_specification,
-         "gun_model_params": _check_and_convert_gun_model_params,
-         "lens_model_params": _check_and_convert_lens_model_params,
-         "tilt_params": _check_and_convert_tilt_params,
-         "objective_aperture_params": \
-         _check_and_convert_objective_aperture_params,
-         "defocal_offset_supersampling": \
-         _check_and_convert_defocal_offset_supersampling}
+    ctor_param_names = ("sample_specification",
+                        "gun_model_params",
+                        "lens_model_params",
+                        "tilt_params",
+                        "objective_aperture_params",
+                        "defocal_offset_supersampling")
+    kwargs = {"namespace_as_dict": globals(),
+              "ctor_param_names": ctor_param_names}
+    
+    _validation_and_conversion_funcs_ = \
+        fancytypes.return_validation_and_conversion_funcs(**kwargs)
+    _pre_serialization_funcs_ = \
+        fancytypes.return_pre_serialization_funcs(**kwargs)
+    _de_pre_serialization_funcs_ = \
+        fancytypes.return_de_pre_serialization_funcs(**kwargs)
 
-    _pre_serialization_funcs = \
-        {"sample_specification": _pre_serialize_sample_specification,
-         "gun_model_params": _pre_serialize_gun_model_params,
-         "lens_model_params": _pre_serialize_lens_model_params,
-         "tilt_params": _pre_serialize_tilt_params,
-         "objective_aperture_params": _pre_serialize_objective_aperture_params,
-         "defocal_offset_supersampling": \
-         _pre_serialize_defocal_offset_supersampling}
+    del ctor_param_names, kwargs
 
-    _de_pre_serialization_funcs = \
-        {"sample_specification": _de_pre_serialize_sample_specification,
-         "gun_model_params": _de_pre_serialize_gun_model_params,
-         "lens_model_params": _de_pre_serialize_lens_model_params,
-         "tilt_params": _de_pre_serialize_tilt_params,
-         "objective_aperture_params": \
-         _de_pre_serialize_objective_aperture_params,
-         "defocal_offset_supersampling": \
-         _de_pre_serialize_defocal_offset_supersampling}
+    
     
     def __init__(self,
                  sample_specification,
-                 gun_model_params=None,
-                 lens_model_params=None,
-                 tilt_params=None,
-                 objective_aperture_params=None,
-                 defocal_offset_supersampling=1):
-        ctor_params = \
-            {"sample_specification": sample_specification,
-             "gun_model_params": gun_model_params,
-             "lens_model_params": lens_model_params,
-             "tilt_params": tilt_params,
-             "objective_aperture_params": objective_aperture_params,
-             "defocal_offset_supersampling": defocal_offset_supersampling}
-        fancytypes.PreSerializableAndUpdatable.__init__(self, ctor_params)
+                 gun_model_params=\
+                 _default_gun_model_params,
+                 lens_model_params=\
+                 _default_lens_model_params,
+                 tilt_params=\
+                 _default_tilt_params,
+                 objective_aperture_params=\
+                 _default_objective_aperture_params,
+                 defocal_offset_supersampling=\
+                 _default_defocal_offset_supersampling,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
+        ctor_params = {key: val
+                       for key, val in locals().items()
+                       if (key not in ("self", "__class__"))}
+        kwargs = ctor_params
+        kwargs["skip_cls_tests"] = True
+        fancytypes.PreSerializableAndUpdatable.__init__(self, **kwargs)
 
         return None
 
 
 
-def _check_and_convert_hrtem_system_model_params(ctor_params):
-    hrtem_system_model_params = \
-        copy.deepcopy(ctor_params["hrtem_system_model_params"])    
-    kwargs = {"obj": hrtem_system_model_params,
-              "obj_name": "hrtem_system_model_params",
-              "accepted_types": (ModelParams,)}
+    @classmethod
+    def get_validation_and_conversion_funcs(cls):
+        validation_and_conversion_funcs = \
+            cls._validation_and_conversion_funcs_.copy()
+
+        return validation_and_conversion_funcs
+
+
+    
+    @classmethod
+    def get_pre_serialization_funcs(cls):
+        pre_serialization_funcs = \
+            cls._pre_serialization_funcs_.copy()
+
+        return pre_serialization_funcs
+
+
+    
+    @classmethod
+    def get_de_pre_serialization_funcs(cls):
+        de_pre_serialization_funcs = \
+            cls._de_pre_serialization_funcs_.copy()
+
+        return de_pre_serialization_funcs
+
+
+
+def _check_and_convert_hrtem_system_model_params(params):
+    obj_name = "hrtem_system_model_params"
+    obj = params[obj_name]
+
+    accepted_types = (ModelParams,)
+
+    kwargs = {"obj": obj,
+              "obj_name": obj_name,
+              "accepted_types": accepted_types}
     czekitout.check.if_instance_of_any_accepted_types(**kwargs)
+
+    kwargs = obj.get_core_attrs(deep_copy=False)
+    hrtem_system_model_params = accepted_types[0](**kwargs)
+
+    if "worker_params" not in params:
+        hrtem_system_model_params_core_attrs = \
+            hrtem_system_model_params.get_core_attrs(deep_copy=False)
+
+        sample_specification = \
+            hrtem_system_model_params_core_attrs["sample_specification"]
+
+        kwargs = {"params": dict()}
+        kwargs["params"]["sample_specification"] = sample_specification
+        _check_and_convert_sample_specification(**kwargs)
 
     return hrtem_system_model_params
 
 
 
 def _pre_serialize_hrtem_system_model_params(hrtem_system_model_params):
-    serializable_rep = hrtem_system_model_params.pre_serialize()
-
+    obj_to_pre_serialize = hrtem_system_model_params
+    serializable_rep = obj_to_pre_serialize.pre_serialize()
+    
     return serializable_rep
 
 
 
 def _de_pre_serialize_hrtem_system_model_params(serializable_rep):
     hrtem_system_model_params = ModelParams.de_pre_serialize(serializable_rep)
-
-    return hrtem_system_model_params
     
+    return hrtem_system_model_params
+
 
 
 ###########################

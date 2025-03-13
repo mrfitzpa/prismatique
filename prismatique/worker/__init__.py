@@ -105,16 +105,12 @@ def _de_pre_serialize_gpu_params(serializable_rep):
 
 
 
-_module_alias_1 = \
-    prismatique.worker.cpu
-_module_alias_2 = \
-    prismatique.worker.gpu
 _default_cpu_params = \
-    _module_alias_1._default_cpu_params
+    None
 _default_gpu_params = \
-    _module_alias_2._default_gpu_params
+    None
 _default_skip_validation_and_conversion = \
-    _module_alias_1._default_skip_validation_and_conversion
+    False
 
 
 

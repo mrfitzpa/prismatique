@@ -37,9 +37,6 @@ import numpy as np
 import czekitout.check
 import czekitout.convert
 
-# For checking whether floats are approximately zero.
-import emconstants
-
 
 
 # Import child modules and packages of current package.
@@ -86,20 +83,24 @@ def _check_and_convert_scan_config(params):
     try:
         kwargs = \
             {"obj": params[obj_name], "obj_name": obj_name}
-        scan_config = \
+        matrix = \
             czekitout.convert.to_real_two_column_numpy_matrix(**kwargs)
+
+        scan_config = tuple()
+        for idx, row in enumerate(matrix):
+            scan_config += (tuple(row.tolist()),)
     except:
         try:
             scan_config = \
-                czekitout.convert.to_str_from_path_like(**kwargs)
+                czekitout.convert.to_str_from_str_like(**kwargs)
         except:
             try:
                 params = \
                     {"rectangular_scan_params": params["scan_config"]}
-                mod_alias = \
+                module_alias = \
                     prismatique.scan.rectangular
                 func_alias = \
-                    mod_alias._check_and_convert_rectangular_scan_params
+                    module_alias._check_and_convert_rectangular_scan_params
                 scan_config = \
                     func_alias(params)
 
@@ -119,7 +120,7 @@ def _check_and_convert_filename(params):
 
     try:
         kwargs = {"obj": obj, "obj_name": obj_name}
-        filename = czekitout.convert.to_str_from_path_like(**kwargs)
+        filename = czekitout.convert.to_str_from_str_like(**kwargs)
     except:
         kwargs = {"obj": obj,
                   "obj_name": obj_name,
@@ -129,6 +130,15 @@ def _check_and_convert_filename(params):
         filename = obj
 
     return filename
+
+
+
+def _check_and_convert_skip_validation_and_conversion(params):
+    module_alias = prismatique.sample
+    func_alias = module_alias._check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    return skip_validation_and_conversion
 
 
 
@@ -277,8 +287,7 @@ def _generate_probe_positions(sample_specification, scan_config, filename):
     if output_filename is not None:
         _save_probe_positions(probe_positions,
                               sample_specification,
-                              output_filename,
-                              fold_into_one_supercell=False)
+                              output_filename)
     
     return probe_positions
 
@@ -288,11 +297,8 @@ def _check_scan_config_file_format(scan_config):
     input_filename = scan_config
     _pre_load(input_filename)
     
-    try:
-        with open(input_filename, 'rb') as file_obj:
-            lines = file_obj.readlines()[1:]
-    except BaseException as err:
-        raise err
+    with open(input_filename, 'rb') as file_obj:
+        lines = file_obj.readlines()[1:]
 
     current_func_name = "_check_scan_config_file_format"
 
@@ -320,8 +326,8 @@ def _pre_load(input_filename):
     current_func_name = "_pre_load"
 
     try:
-        if not pathlib.Path(input_filename).is_file():
-            raise FileNotFoundError
+        with open(input_filename, 'rb') as file_obj:
+            lines = file_obj.readline()
     except FileNotFoundError:
         unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
         err_msg = unformatted_err_msg.format(input_filename)
@@ -330,8 +336,6 @@ def _pre_load(input_filename):
         unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
         err_msg = unformatted_err_msg.format(input_filename)
         raise PermissionError(err_msg)
-    except BaseException as err:
-        raise err
 
     return None
 
@@ -342,11 +346,10 @@ def _load_probe_positions(input_filename):
         lines = file_obj.readlines()[1:-1]
     num_lines = len(lines)
     
-    probe_positions = np.empty([num_lines, 2])
+    probe_positions = tuple()
     for idx, line in enumerate(lines):
         x_coord, y_coord = tuple(float(elem) for elem in line.split())
-        probe_positions[idx][0] = x_coord
-        probe_positions[idx][1] = y_coord
+        probe_positions += ((x_coord, y_coord),)
 
     return probe_positions
 
@@ -354,19 +357,16 @@ def _load_probe_positions(input_filename):
 
 def _save_probe_positions(probe_positions,
                           sample_specification,
-                          output_filename,
-                          fold_into_one_supercell):
+                          output_filename):
     _pre_save(output_filename)
+    _mk_parent_dir(filename=output_filename)
     
     Delta_X, Delta_Y, _ = \
-        prismatique.sample.supercell_dims(sample_specification)
+        prismatique.sample._supercell_dims(sample_specification)
 
     with open(output_filename, 'w') as file_obj:
         file_obj.write("x y\n")  # Header.
         for x_coord, y_coord in probe_positions:
-            if fold_into_one_supercell:
-                x_coord = x_coord % Delta_X
-                y_coord = y_coord % Delta_Y
             line = str(x_coord) + " " + str(y_coord) + "\n"
             file_obj.write(line)
         file_obj.write("-1")  # End of file.
@@ -376,40 +376,31 @@ def _save_probe_positions(probe_positions,
 
 
 def _pre_save(output_filename):
-    temp_dir_path, rm_temp_dir = _mk_parent_dir(filename=output_filename)
+    first_new_dir_made = _mk_parent_dir(filename=output_filename)
 
     current_func_name = "_pre_save"
 
-    try:
-        if not pathlib.Path(output_filename).is_file():
-            try:
-                with open(output_filename, "w") as file_obj:
-                    pass
-            except PermissionError:
-                unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
-                err_msg = unformatted_err_msg.format(output_filename)
-                raise PermissionError(err_msg)
-            except BaseException as err:
-                raise err
+    if not pathlib.Path(output_filename).is_file():
+        try:
+            with open(output_filename, "w") as file_obj:
+                pass
+        except PermissionError:
+            unformatted_err_msg = globals()[current_func_name+"_err_msg_1"]
+            err_msg = unformatted_err_msg.format(output_filename)
+            raise PermissionError(err_msg)
         
-            pathlib.Path(output_filename).unlink(missing_ok=True)
-        else:
-            try:
-                with open(output_filename, "a") as file_obj:
-                    pass
-            except PermissionError:
-                unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
-                err_msg = unformatted_err_msg.format(output_filename)
-                raise PermissionError(err_msg)
-            except BaseException as err:
-                raise err
-    except BaseException as err:
-        if rm_temp_dir:
-            shutil.rmtree(temp_dir_path)
-        raise err
+        pathlib.Path(output_filename).unlink(missing_ok=True)
+    else:
+        try:
+            with open(output_filename, "a") as file_obj:
+                pass
+        except PermissionError:
+            unformatted_err_msg = globals()[current_func_name+"_err_msg_2"]
+            err_msg = unformatted_err_msg.format(output_filename)
+            raise PermissionError(err_msg)
 
-    if rm_temp_dir:
-        shutil.rmtree(temp_dir_path)
+    if first_new_dir_made is not None:
+        shutil.rmtree(first_new_dir_made)
 
     return None
 
@@ -443,7 +434,10 @@ def _mk_parent_dir(filename):
 
 
 
-def pattern_type(scan_config=None):
+def pattern_type(scan_config=\
+                 _default_scan_config,
+                 skip_validation_and_conversion=\
+                 _default_skip_validation_and_conversion):
     r"""The scan pattern type of a given probe scan pattern.
 
     Parameters
@@ -472,6 +466,15 @@ def pattern_type(scan_config=None):
         is set to `None`, [i.e.  the default value], then the probe is to be
         scanned across the entire unit cell of the simulation, in steps of 0.25
         angstroms in both the :math:`x`- and :math:`y`-directions.
+    skip_validation_and_conversion : `bool`, optional
+        If ``skip_validation_and_conversion`` is set to ``False``, then
+        validations and conversions are performed on the above
+        parameters. 
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``, no
+        validations and conversions are performed on the above parameters. This
+        option is desired primarily when the user wants to avoid potentially
+        expensive validation and/or conversion operations.
 
     Returns
     -------
@@ -488,12 +491,25 @@ def pattern_type(scan_config=None):
         is different from the previous two.
 
     """
-    temp_ctor_params = {"scan_config": scan_config}
-    scan_config = _check_and_convert_scan_config(temp_ctor_params)
-    if isinstance(scan_config, str):
-        _check_scan_config_file_format(scan_config)
-        
-    scan_pattern_type = _pattern_type(scan_config)
+    params = locals()
+
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
+
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    if isinstance(kwargs["scan_config"], str):
+        _check_scan_config_file_format(**kwargs)
+    scan_pattern_type = _pattern_type(**kwargs)
     
     return scan_pattern_type
 
@@ -503,16 +519,21 @@ def _pattern_type(scan_config):
     if not isinstance(scan_config, prismatique.scan.rectangular.Params):
         scan_pattern_type = "no underlying rectangular grid"
     else:
-        if scan_config.core_attrs["jitter"] == 0:
-            scan_pattern_type = "rectangular grid"
-        else:
-            scan_pattern_type = "jittered rectangular grid"
+        scan_config_core_attrs = scan_config.get_core_attrs(deep_copy=False)
+        jitter = scan_config_core_attrs["jitter"]
+        scan_pattern_type = ("rectangular grid"
+                             if (jitter == 0)
+                             else "jittered rectangular grid")
 
     return scan_pattern_type
 
 
 
-def grid_dims_in_units_of_probe_shifts(sample_specification, scan_config=None):
+def grid_dims_in_units_of_probe_shifts(sample_specification,
+                                       scan_config=\
+                                       _default_scan_config,
+                                       skip_validation_and_conversion=\
+                                       _default_skip_validation_and_conversion):
     r"""The underlying grid dimensions of a given probe scan pattern, in units
     of probe shifts.
 
@@ -572,6 +593,15 @@ def grid_dims_in_units_of_probe_shifts(sample_specification, scan_config=None):
         is set to `None`, [i.e.  the default value], then the probe is to be
         scanned across the entire unit cell of the simulation, in steps of 0.25
         angstroms in both the :math:`x`- and :math:`y`-directions.
+    skip_validation_and_conversion : `bool`, optional
+        If ``skip_validation_and_conversion`` is set to ``False``, then
+        validations and conversions are performed on the above
+        parameters. 
+
+        Otherwise, if ``skip_validation_and_conversion`` is set to ``True``, no
+        validations and conversions are performed on the above parameters. This
+        option is desired primarily when the user wants to avoid potentially
+        expensive validation and/or conversion operations.
 
     Returns
     -------
@@ -586,17 +616,23 @@ def grid_dims_in_units_of_probe_shifts(sample_specification, scan_config=None):
         respectively of the underlying rectangular grid of the scanning pattern.
 
     """
-    accepted_types = (prismatique.sample.ModelParams,
-                      prismatique.sample.PotentialSliceSubsetIDs,
-                      prismatique.sample.SMatrixSubsetIDs,
-                      prismatique.sample.PotentialSliceAndSMatrixSubsetIDs)
-    prismatique.sample._check_sample_specification(sample_specification,
-                                                   accepted_types)
+    params = locals()
 
-    temp_ctor_params = {"scan_config": scan_config}
-    scan_config = _check_and_convert_scan_config(temp_ctor_params)
-    grid_dims = _grid_dims_in_units_of_probe_shifts(sample_specification,
-                                                    scan_config)
+    func_alias = _check_and_convert_skip_validation_and_conversion
+    skip_validation_and_conversion = func_alias(params)
+
+    if (skip_validation_and_conversion == False):
+        global_symbol_table = globals()
+        for param_name in params:
+            if param_name == "skip_validation_and_conversion":
+                continue
+            func_name = "_check_and_convert_" + param_name
+            func_alias = global_symbol_table[func_name]
+            params[param_name] = func_alias(params)
+
+    kwargs = params
+    del kwargs["skip_validation_and_conversion"]
+    grid_dims = _grid_dims_in_units_of_probe_shifts(**kwargs)
 
     return grid_dims
 
@@ -608,15 +644,17 @@ def _grid_dims_in_units_of_probe_shifts(sample_specification, scan_config):
     else:
         Delta_X, Delta_Y, _ = \
             prismatique.sample._supercell_dims(sample_specification)
-        
-        min_x_probe_coord = Delta_X * scan_config.core_attrs["window"][0]
-        max_x_probe_coord = Delta_X * scan_config.core_attrs["window"][1]
-        min_y_probe_coord = Delta_Y * scan_config.core_attrs["window"][2]
-        max_y_probe_coord = Delta_Y * scan_config.core_attrs["window"][3]
 
-        x_probe_coord_step = scan_config.core_attrs["step_size"][0]
-        y_probe_coord_step = scan_config.core_attrs["step_size"][1]
-        tol = emconstants.tol
+        scan_config_core_attrs = scan_config.get_core_attrs(deep_copy=False)
+        
+        min_x_probe_coord = Delta_X * scan_config_core_attrs["window"][0]
+        max_x_probe_coord = Delta_X * scan_config_core_attrs["window"][1]
+        min_y_probe_coord = Delta_Y * scan_config_core_attrs["window"][2]
+        max_y_probe_coord = Delta_Y * scan_config_core_attrs["window"][3]
+
+        x_probe_coord_step = scan_config_core_attrs["step_size"][0]
+        y_probe_coord_step = scan_config_core_attrs["step_size"][1]
+        tol = 1e-10
 
         x_coords = np.arange(min_x_probe_coord,
                              max_x_probe_coord+tol,
@@ -625,7 +663,7 @@ def _grid_dims_in_units_of_probe_shifts(sample_specification, scan_config):
                              max_y_probe_coord+tol,
                              y_probe_coord_step)
 
-        grid_dims = np.array((len(x_coords), len(y_coords)))
+        grid_dims = (len(x_coords), len(y_coords))
 
     return grid_dims
 
@@ -634,6 +672,11 @@ def _grid_dims_in_units_of_probe_shifts(sample_specification, scan_config):
 ###########################
 ## Define error messages ##
 ###########################
+
+_check_and_convert_scan_config_err_msg_1 = \
+    ("The object ``scan_config`` must be either a real two-column matrix, "
+     "a string, or an instance of the class "
+     ":class:`prismatique.scan.rectangular.Params`.")
 
 _check_scan_config_file_format_err_msg_1 = \
     ("The last line in the probe scan configuration file ``{}`` (i.e. the file "
