@@ -508,7 +508,7 @@ def _probe_positions(filename, force_2_col_shape):
     if not force_2_col_shape:
         if scan_pattern_type(filename) == "rectangular grid":
             X_dim, Y_dim = grid_dims_in_units_of_probe_shifts(filename)
-            positions = np.reshape(positions, shape=(X_dim, Y_dim, 2))
+            positions = np.reshape(positions, (X_dim, Y_dim, 2))
             positions = np.transpose(positions, axes=[1, 0, 2])
             positions = positions[::-1, :, :]
 
@@ -2164,9 +2164,12 @@ def _prismatique_metadata_resulting_from_single_dim_slices_of_length_one(
                 extra_key = "vector component"
                 extra_val = (r"$x$", r"$y$")[single_dim_slice]
             else:
-                continue
+                extra_key = "dummy"
+                extra_val = None
 
             prismatique_metadata[extra_key] = extra_val
+
+    prismatique_metadata.pop("dummy", None)
 
     return prismatique_metadata
 
