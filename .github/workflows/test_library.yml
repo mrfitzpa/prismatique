@@ -44,4 +44,10 @@ jobs:
         python -m pip install .[tests]
         
     - name: Measure code coverage
-      run: source run_tests.sh
+      run: |
+        cd tests
+        python -m pytest --cov --cov-config=../.coveragerc -vv
+        python -m coverage combine
+        python -m coverage json
+        python -m coverage report --fail-under=100
+        cd ..
