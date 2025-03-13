@@ -4,6 +4,13 @@
 # Ignore select directories.
 __pycache__/
 .ipynb_checkpoints/
+.tox/
+htmlcov/
+dist/
+docs/_autosummary/
+docs/_build/
+pages/
+.pytest_cache/
 input-files/
 output-files/
 notebooks/
@@ -13,16 +20,28 @@ examples/hrtem-example/
 examples/data/
 
 # Ignore select files.
+.coverage
+.python-version
+prismatique/version.py
+tests/coverage.json
 scratch_param.txt
 _temp_scan_config_file.txt
 _requirements-doc.txt
 
+# Ignore generated output coverage files.
+tests/coverage*
+tests/.coverage*
+
 # Ignore .pyc files.
 *.pyc
+
+# Ignore JSON files.
+*.json
 
 # Ignore backup files.
 \#*#
 *.bak
+*~
 
 # Ignore pip install build files.
 build/
