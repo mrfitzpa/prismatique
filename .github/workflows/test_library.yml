@@ -35,7 +35,8 @@ jobs:
     - name: Setup Conda
       uses: conda-incubator/setup-miniconda@v3
       with:
-        auto-update-conda: true
+        miniconda-version: "latest"
+        activate-environment: test
         python-version: ${{ matrix.python-version }}
     
     - name: Install dependencies
@@ -44,10 +45,4 @@ jobs:
         python -m pip install .[tests]
         
     - name: Measure code coverage
-      run: |
-        cd tests
-        python -m pytest --cov --cov-config=../.coveragerc -vv
-        python -m coverage combine
-        python -m coverage json
-        python -m coverage report --fail-under=100
-        cd ..
+      run: source run_tests.sh
