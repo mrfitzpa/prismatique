@@ -43,6 +43,7 @@ jobs:
       run: |
         conda install -c conda-forge pyprismatic=2.*=cpu*
         python -m pip install .[tests]
+        python -m pip install numpy --upgrade
         
     - name: Measure code coverage
       run: source run_tests.sh
