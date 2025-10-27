@@ -41,8 +41,8 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install .[tests]
         conda install -c conda-forge pyprismatic=2.*=cpu*
+        python -m pip install .[tests]
         
     - name: Measure code coverage
       run: source run_tests.sh
