@@ -1,6 +1,9 @@
 name: Test library
-# This workflow runs the unit tests for the Python versions 3.8, 3.9, 3.10, and
-# 3.11.
+
+# This workflow runs the unit tests for the Python versions 3.9, 3.10, and
+# 3.11. Note that ``numpy`` had to be pinned to a specific version to circumvent
+# a compatibility issue with other libraries, when using earlier versions of
+# Python.
 
 on:
   push:
@@ -22,7 +25,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11"]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -41,8 +44,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install 'numpy<=1.26.4'
-        conda install -c conda-forge pyprismatic=2.*=cpu*
+        conda install -c conda-forge pyprismatic=2.*=cpu* "numpy==1.26.4"
         python -m pip install .[tests]
         
     - name: Measure code coverage
