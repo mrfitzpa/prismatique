@@ -41,7 +41,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip install numpy<2.0.0
+        python -m pip install numpy<=1.26.4
         conda install -c conda-forge pyprismatic=2.*=cpu*
         python -m pip install .[tests]
         
