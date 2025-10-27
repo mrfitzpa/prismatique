@@ -1808,8 +1808,8 @@ def potential_slices(filename,
         :class:`hyperspy._signals.signal2d.Signal2D` class if
         ``average_laterally_in_space`` is set to ``False``, otherwise it is
         stored in an instance of the :class:`hyperspy.signal.BaseSignal`. See
-        the documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        the documentation and/or reference guide for the :mod:`hyperspy` package
+        for details on how to use instances of the
         :class:`hyperspy._signals.signal2d.Signal2D` and
         :class:`hyperspy.signal.BaseSignal` classes.
     navigational_to_original_indices_map : `dict`
@@ -2834,8 +2834,8 @@ def S_matrix_wavefunctions(filename,
     S_matrix_wavefunction_signal : :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D`
         The subcollection of :math:`S`-matrices, stored in an instance of the
         :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D` class.  See
-        the documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        the documentation and/or reference guide for the :mod:`hyperspy` package
+        for details on how to use instances of the
         :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D` class.
     navigational_to_original_indices_map : `dict`
         A dictionary that maps the navigational indices of the hyperspy signal
@@ -3078,8 +3078,8 @@ def cbed_wavefunctions(filename,
         The subcollection of CBED wavefunction patterns, stored in an instance
         of the :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D`
         class.  See the documentation and/or reference guide for the
-        :hyperspy:`hyperspy <>` package for details on how to use instances of
-        the :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D` class.
+        :mod:`hyperspy` package for details on how to use instances of the
+        :class:`hyperspy._signals.complex_signal2d.ComplexSignal2D` class.
     navigational_to_original_indices_map : `dict`
         A dictionary that maps the navigational indices of the hyperspy signal
         ``cbed_wavefunction_signal`` to the original indices specified by
@@ -3428,8 +3428,8 @@ def cbed_intensity_patterns(
     cbed_intensity_pattern_signal : :class:`hyperspy._signals.signal2d.Signal2D`
         The subcollection of CBED intensity patterns, stored in an instance of
         the :class:`hyperspy._signals.signal2d.Signal2D` class.  See the
-        documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        documentation and/or reference guide for the :mod:`hyperspy` package for
+        details on how to use instances of the
         :class:`hyperspy._signals.signal2d.Signal2D` class.
     navigational_to_original_indices_map : `dict`
         A dictionary that maps the navigational indices of the hyperspy signal
@@ -3608,8 +3608,8 @@ def com_momenta(filename,
         :class:`hyperspy._signals.signal2d.Signal2D` class; otherwise they are
         stored in an instance of the
         :class:`hyperspy._signals.signal1d.Signal1D` class. See the
-        documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        documentation and/or reference guide for the :mod:`hyperspy` package for
+        details on how to use instances of the
         :class:`hyperspy._signals.signal1d.Signal1D` and
         :class:`hyperspy._signals.signal2d.Signal2D` classes.
     navigational_to_original_indices_map : `dict`        
@@ -3815,8 +3815,8 @@ def stem_intensity_images(
         :class:`hyperspy._signals.signal2d.Signal2D` class; otherwise they are
         stored in an instance of the
         :class:`hyperspy._signals.signal1d.Signal1D` class. See the
-        documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        documentation and/or reference guide for the :mod:`hyperspy` package for
+        details on how to use instances of the
         :class:`hyperspy._signals.signal1d.Signal1D` and
         :class:`hyperspy._signals.signal2d.Signal2D` classes.
     navigational_to_original_indices_map : `dict`
@@ -3997,8 +3997,8 @@ def azimuthally_integrated_cbed_intensity_patterns(
         The subcollection of azimuthally integrated CBED intensity patterns,
         stored in an instance of the
         :class:`hyperspy._signals.signal2d.Signal2D` class.  See the
-        documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        documentation and/or reference guide for the :mod:`hyperspy` package for
+        details on how to use instances of the
         :class:`hyperspy._signals.signal2d.Signal2D` class.
     navigational_to_original_indices_map : `dict`
         A dictionary that maps the navigational indices of the hyperspy signal
@@ -4396,8 +4396,8 @@ def hrtem_intensity_image(filename,
     hrtem_intensity_image_signal : :class:`hyperspy._signals.signal2d.Signal2D`
         The HRTEM intensity image, stored in an instance of the
         :class:`hyperspy._signals.signal2d.Signal2D` class.  See the
-        documentation and/or reference guide for the :hyperspy:`hyperspy <>`
-        package for details on how to use instances of the
+        documentation and/or reference guide for the :mod:`hyperspy` package for
+        details on how to use instances of the
         :class:`hyperspy._signals.signal2d.Signal2D` class.
 
     """

@@ -3,6 +3,20 @@
 Example of potential slice generation
 =====================================
 
+
+
+Prerequisites for running this example
+--------------------------------------
+
+Prior to running any scripts or Jupyter notebooks in the directory
+``<root>/examples``, where ``<root>`` is the root of the ``prismatique``
+repository, a set of Python libraries need to be installed in the Python
+environment within which any such scripts or Jupyter notebooks are to be
+executed. See :ref:`this page <examples_prerequisites_for_running_examples_sec>`
+for instructions on how to do so.
+
+
+
 Example description
 -------------------
 
@@ -11,6 +25,8 @@ In this example, we generate the potential slices for the bilayer
 :ref:`atomic_coord_generator_example_sec` page. See the documentation for the
 class :class:`prismatique.discretization.Params` for a discussion on potential
 slices.
+
+
 
 Code
 ----

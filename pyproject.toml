@@ -41,8 +41,9 @@ keywords = [
     "electron probe"
 ]
 dependencies = [
-    "embeam",
-    "h5pywrappers"
+    "embeam>=0.0.5",
+    "h5pywrappers",
+    "hyperspy_gui_ipywidgets"
 ]
 requires-python = ">=3.8"
 

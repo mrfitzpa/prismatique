@@ -545,7 +545,9 @@ def _calc_smallest_possible_angular_space_pixel_size(sample_specification,
               "skip_validation_and_conversion": True}
     electron_beam_wavelength = embeam.wavelength(**kwargs)
     
-    result = electron_beam_wavelength / sample_supercell_dims[:2] * 1000
+    result = (electron_beam_wavelength
+              / np.array(sample_supercell_dims[:2])
+              * 1000)
     result = tuple(float(elem) for elem in result)
 
     return result

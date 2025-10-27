@@ -3567,7 +3567,7 @@ def _S_matrix_subset_data_size(sample_specification,
     size_of_single = 4  # In bytes.
     size_of_complex_single = 2 * size_of_single  # In bytes.
     
-    data_size = num_elems * size_of_complex_single
+    data_size = int(np.round(num_elems * size_of_complex_single))
         
     return data_size
 

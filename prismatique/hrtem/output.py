@@ -533,7 +533,7 @@ def data_size(hrtem_system_model_params,
     del kwargs["skip_validation_and_conversion"]
     output_data_size  = _data_size(**kwargs)
     
-    return None
+    return output_data_size
 
 
 

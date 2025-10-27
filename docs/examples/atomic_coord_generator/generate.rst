@@ -3,6 +3,20 @@
 Example of atomic coordinate generation
 =======================================
 
+
+
+Prerequisites for running this example
+--------------------------------------
+
+Prior to running any scripts or Jupyter notebooks in the directory
+``<root>/examples``, where ``<root>`` is the root of the ``prismatique``
+repository, a set of Python libraries need to be installed in the Python
+environment within which any such scripts or Jupyter notebooks are to be
+executed. See :ref:`this page <examples_prerequisites_for_running_examples_sec>`
+for instructions on how to do so.
+
+
+
 Example description
 -------------------
 
@@ -108,6 +122,8 @@ are:
 Note that a single lattice unit cell tiled laterally forms two atomic layers of
 :math:`\text{MoS}_2`.
 
+
+      
 Code
 ----
 

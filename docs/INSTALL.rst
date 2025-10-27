@@ -1,7 +1,12 @@
 .. _installation_instructions_sec:
 
-Installation instructions
-=========================
+Instructions for installing and uninstalling ``prismatique``
+============================================================
+
+
+
+Installing ``prismatique``
+--------------------------
 
 For all installation scenarios, first open up the appropriate command line
 interface. On Unix-based systems, you would open a terminal. On Windows systems
@@ -11,13 +16,10 @@ GPU acceleration is available for ``prismatique`` installed on Linux and Windows
 machines that have NVIDIA GPUs. You will need to make sure that you have a
 NVIDIA driver installed with CUDA version 10.2.89 or greater. 
 
-Typical installation times range from 3-15 minutes.
 
-Installing embeam using pip and conda
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note**: these instructions have been tested on ``Ubuntu 20.04`` and ``Windows
-10``.
+Installing ``prismatique`` using ``pip`` and ``conda`` together
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The easiest way to install ``prismatique`` involves using both the conda package
 manager and ``pip``. While it is possible to install ``prismatique`` without the
@@ -26,9 +28,9 @@ discuss only the simplest installation procedure below.
 
 Of course, to use the conda package manager, one must install either
 ``anaconda3`` or ``miniconda3``. For installation instructions for ``anaconda3``
-click `here <https://docs.anaconda.com/anaconda/install/index.html>`__; for
+click `here <https://docs.anaconda.com/anaconda/install/index.html>`_; for
 installation instructions for ``miniconda3`` click `here
-<https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html>`__.
+<https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html>`_.
 
 First, open up the appropriate command line interface. On Unix-based systems,
 you would open a terminal. On Windows systems you would open an Anaconda Prompt
@@ -41,7 +43,7 @@ following command::
 
 It is recommended that you install ``prismatique`` and its dependencies in a
 virtual environment: click `here
-<https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`__
+<https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_
 for a discussion on the creation and management of conda virtual
 environments. The remaining instructions assumes that you activate the conda
 (virtual) environment in which you intend to install ``prismatique`` and its
@@ -61,8 +63,9 @@ with ``prismatique``, run the following command::
 
 where ``<X>`` and ``<Y>`` are the major and minor versions of CUDA installed on
 your machine, e.g. CUDA version 10.2.89 has a major version of ``10``, and a
-minor version of ``2``. Otherwise, for CPU support only, run the following
-command::
+minor version of ``2``. Users can omit ``cudatoolkit==<X>.<Y>.*`` if they do not
+require a specific version of ``cudatoolkit``, which should apply to most
+scenarios. For CPU support only, run the following command instead::
 
   conda install -c conda-forge pyprismatic=2.*=cpu*
 
@@ -82,39 +85,46 @@ repository by running the following command::
 
   git clone https://github.com/mrfitzpa/prismatique.git
 
-Next, change into the root of the cloned repository, and then run the following
-command::
+then subsequently change into the root of the cloned repository, and then run
+the following command::
 
   pip install .
 
-Note that you must include the period as well. The above command executes a
-standard installation of ``prismatique``.
+Note that you must include the period as well.
 
-Optionally, for additional features in ``prismatique``, one can install additional
-dependencies upon installing ``prismatique``. To install a subset of additional
-dependencies (along with the standard installation), run the following command
-from the root of the repository::
+Optionally, for additional features in ``prismatique``, one can install
+additional dependencies upon installing ``prismatique`` via ``pip``. To install
+a subset of additional dependencies (along with the standard installation), run
+the following command from the root of the repository::
 
   pip install .[<selector>]
 
 where ``<selector>`` can be one of the following:
 
 * ``tests``: to install the dependencies necessary for running unit tests;
-* ``examples``: to install the dependencies necessary for running the jupyter
-  notebooks stored in ``<root>/examples``, where ``<root>`` is the root of the
-  repository;
+* ``examples``: to install the dependencies necessary for executing files stored
+  in `<root>/examples`, where `<root>` is the root of the repository;
 * ``docs``: to install the dependencies necessary for documentation generation;
 * ``all``: to install all of the above optional dependencies.
 
-Uninstall prismatique
----------------------
+Alternatively, one can run::
+
+  pip install prismatique[<selector>]
+
+elsewhere in order to install the latest stable version of ``prismatique``,
+along with the subset of additional dependencies specified by ``<selector>``.
+
+
+
+Uninstalling ``prismatique``
+----------------------------
 
 If ``prismatique`` was installed using ``pip``, then to uninstall, run the
-following command from the root of the repository::
+following command::
 
   pip uninstall prismatique
 
 If ``prismatique`` was installed using ``conda``, then to uninstall, run the
-following command from the root of the repository::
+following command::
 
   conda remove prismatique

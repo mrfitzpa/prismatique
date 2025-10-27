@@ -3,6 +3,20 @@
 Example of running a STEM simulation using the PRISM algorithm
 ==============================================================
 
+
+
+Prerequisites for running this example
+--------------------------------------
+
+Prior to running any scripts or Jupyter notebooks in the directory
+``<root>/examples``, where ``<root>`` is the root of the ``prismatique``
+repository, a set of Python libraries need to be installed in the Python
+environment within which any such scripts or Jupyter notebooks are to be
+executed. See :ref:`this page <examples_prerequisites_for_running_examples_sec>`
+for instructions on how to do so.
+
+
+
 Example description
 -------------------
 
@@ -11,6 +25,8 @@ In this example, we simulate a STEM experiment involving the bilayer
 :ref:`atomic_coord_generator_example_sec` page. The STEM simulation is
 implemented using the PRISM algorithm. See the documentation for the subpackage
 :mod:`prismatique.stem` for a discussion on the PRISM algorithm.
+
+
 
 Code
 ----
