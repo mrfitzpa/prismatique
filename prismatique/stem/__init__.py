@@ -96,8 +96,8 @@ sample, which is treated classically; and
     :label: beam_electron_wavefunction_at_z_eq_0
 
 with :math:`\left|x,y\right\rangle` being the electron transverse position
-eigenvector. As discussed in the documentation for the class
-:`prismatique.discretization.Params`, the total potential
+eigenvector. As discussed in the documentation for the
+:class:`prismatique.discretization.Params`, the total potential
 :math:`V\left(\mathbf{r}\right)` is replaced by an effective potential
 :math:`\tilde{V}\left(\mathbf{r}\right)`, which is obtained by coarse-graining
 :math:`V\left(\mathbf{r}\right)` along the :math:`z`-axis:
@@ -253,7 +253,7 @@ the expansion coefficients:
 .. math ::
     \alpha_{k_{x},k_{y}}\left(x_{p},y_{p};\theta_{x},\theta_{y}\right)
     &=\phi_{k_{x},k_{y}}\left(-x_{p}+h\tan\left[\theta_{x}\right],
-    -y_{p}+h\tan\left[\theta_{x}\right]\right)\\
+    -y_{p}+h\tan\left[\theta_{y}\right]\right)\\
     &\mathrel{\phantom{=}}\mathop{\times}
     e^{-i\chi\left(k_{x},k_{y}\right)}\zeta\left(k_{x},k_{y}\right),
     :label: alpha_expansion_coefficients

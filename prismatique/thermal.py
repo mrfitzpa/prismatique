@@ -225,9 +225,9 @@ class Params(fancytypes.PreSerializableAndUpdatable):
     of decoherence for STEM and HRTEM simulations, where for the latter we also
     consider finite source size effects. At finite temperature, the atoms in the
     sample collectively vibrate to form phonons. Typically, the phonons have
-    vibration periods on the order of :math:`10^{-13}`s [Loane1]_. A beam
-    electron will typically pass through the sample in a time on the order of
-    :math:`10^{-16}`s [Loane1]_, which is several orders of magnitude faster
+    vibration periods on the order of :math:`10^{-13}\ \text{s}` [Loane1]_. A
+    beam electron will typically pass through the sample in a time on the order
+    of :math:`10^{-16}\ \text{s}` [Loane1]_, which is several orders of magnitude faster
     than the typical phonon vibration period. Hence, at a semiclassical level,
     any beam electron passing through the sample will interact with the
     vibrating atoms as if they were effectively stationary, i.e. the atoms are
