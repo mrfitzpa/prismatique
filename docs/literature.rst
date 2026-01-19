@@ -27,8 +27,10 @@ documentation:
 		   Chem. Imag. **3**:13 (2017), :doi:`10.1186/s40679-017-0046-1`
 
 .. [Kirkland1] |nbspc|"Advanced Computing in Electron Microscopy", E. Kirkland,
-	              Springer (2010)
+	              Springer (2010),
+	              :doi:`https://doi.org/10.1007/978-3-030-33260-0`
 
-.. [Cowley1] |nbspc|"Diffraction physics", J.M. Cowley, North-Holland (1975)
+.. [Cowley1] |nbspc|"Diffraction physics", J.M. Cowley, North-Holland (1995),
+                    :doi:`https://doi.org/10.1016/B978-0-444-82218-5.X5000-7`
 
 .. |nbspc| unicode:: U+00A0 .. non-breaking space

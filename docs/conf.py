@@ -135,7 +135,8 @@ intersphinx_mapping = \
 
 
 # External links.
-extlinks = {}
+extlinks = {"arxiv": ("https://arxiv.org/abs/%s", "arXiv:%s"),
+            "doi": ("https://dx.doi.org/%s", "doi:%s")}
 
 
 

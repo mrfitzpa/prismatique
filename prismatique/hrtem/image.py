@@ -220,7 +220,7 @@ class Params(fancytypes.PreSerializableAndUpdatable):
     electron's transverse position basis. See Eq. :eq:`I_HRTEM` for a
     mathematical expression of the above. We model :math:`\hat{\rho}_{t}` by
     Eq. :eq:`mixed_state_operator_for_transmitted_electron`, wherein
-    :math:`\hat{\rho}_{t}` is expressed as mixed state. Specifically, it is
+    :math:`\hat{\rho}_{t}` is expressed as a mixed state. Specifically, it is
     expressed as an incoherent average of pure (i.e. coherent) states
     :math:`\left|\psi_{t}\left(\delta_{f};\mathbf{u}_{1},\ldots,\mathbf{u}_{N};
     \boldsymbol{\delta}_{\beta}\right)\right\rangle` over a range of defocii,

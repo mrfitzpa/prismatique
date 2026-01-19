@@ -48,6 +48,7 @@ Contents
    INSTALL
    Reference <_autosummary/prismatique>
    examples
+   literature
    license
 
 

@@ -1,0 +1,83 @@
+cff-version: 1.2.0
+title: Prismatique
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Matthew R. C.
+    family-names: Fitzpatrick
+    email: matthew.rc.fitzpatrick@gmail.com
+    affiliation: University of Victoria
+    orcid: 'https://orcid.org/0000-0001-5347-0629'
+repository-code: 'https://github.com/mrfitzpa/prismatique'
+url: 'https://mrfitzpa.github.io/prismatique/'
+abstract: >-
+  `prismatique` is a wrapper to the Python library `pyprismatic`, which is a
+  library for simulating CBED, STEM, and HRTEM experiments using Multislice
+  algorithms.
+keywords:
+  - hyperspy
+  - multislice
+  - CBED
+  - STEM
+  - HRTEM
+  - GPU
+  - prismatic
+  - pyprismatic
+  - microscopy
+  - electron beam
+  - electron probe
+license: GPL-3.0
+version: 0.0.3
+date-released: '2026-01-18'
+references:
+  - type: article
+    authors:
+      - family-names: Rangel DaCosta
+        given-names: Luis
+      - family-names: Brown
+        given-names: Hamish G.
+      - family-names: Pelz
+        given-names: Philipp M.
+      - family-names: Rakowski
+        given-names: Alexander
+      - family-names: Barber
+        given-names: Natolya
+      - family-names: O'Donovan
+        given-names: Peter
+      - family-names: McBean
+        given-names: Patrick
+      - family-names: Jones
+        given-names: Lewys
+      - family-names: Ciston
+        given-names: Jim
+      - family-names: Scott
+        given-names: M. C.
+      - family-names: Ophus
+        given-names: Colin
+    title: "Prismatic 2.0 – Simulation software for scanning and high resolution transmission electron microscopy (STEM and HRTEM)"
+    doi: '10.1016/j.micron.2021.103141'
+    journal: 'Micron'
+    volume: 151
+    year: 2021
+    month: 12
+    start: '103141'
+    notes: >-
+      `prismatique` provides a wrapper for the algorithms described in 
+      this publication.
+  - type: software
+    title: Prismatic
+    abstract: >-
+      A CUDA/C++/Python package for parallelized simulation of image formation 
+      in Scanning Transmission Electron Microscopy (STEM).
+    repository-code: 'https://github.com/prism-em/prismatic'
+    authors:
+      - family-names: Ophus
+        given-names: Colin
+      - family-names: Rangel DaCosta
+        given-names: Luis
+    license: GPL-3.0
+    notes: >-
+      `prismatique` serves as a Python wrapper for the `pyprismatic` module 
+      distributed within this repository.

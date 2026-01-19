@@ -1,0 +1,58 @@
+{
+    "creators": [
+	{
+	    "name": "Fitzpatrick, Matthew R. C.",
+	    "affiliation": "University of Victoria",
+	    "orcid": "0000-0001-5347-0629"
+	}
+    ],
+    "contributors": [
+        {
+            "name": "Blackburn, Arthur",
+            "affiliation": "University of Victoria",
+            "type": "Supervisor",
+	    "orcid": "0000-0001-6874-9729"
+        }
+    ],
+    "description": "<p>`prismatique` is a wrapper to the Python library `pyprismatic`, which is a library for simulating CBED, STEM, and HRTEM experiments using Multislice algorithms.</p><p>This work was part-funded by the Natural Sciences and Engineering Research Council of Canada (NSERC), from Collaborative Research and Development grant (CRDPJ 543431), partnering with Hitachi High-Tech Canada.</p>",
+    "keywords": [
+	"hyperspy",
+	"multislice",
+	"CBED",
+	"STEM",
+	"HRTEM",
+	"GPU",
+	"prismatic",
+	"pyprismatic",
+	"microscopy",
+	"electron beam",
+	"electron probe"
+    ],
+    "license": {
+	"id": "GPL-3.0"
+    },
+    "publication_date": "2026-01-18",
+    "title": "Prismatique",
+    "version": "0.0.3",
+    "access_right": "open",
+    "upload_type": "software",
+    "language": "eng",
+    "communities": [
+        {"identifier": "tem"},
+	{"identifier": "4d-stem"}
+    ]
+    "related_identifiers": [
+    {
+      "scheme": "doi",
+      "identifier": "10.1016/j.micron.2021.103141",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-article"
+    },
+    {
+      "scheme": "url",
+      "identifier": "https://github.com/prism-em/prismatic",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}

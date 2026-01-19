@@ -207,7 +207,8 @@ class Params(fancytypes.PreSerializableAndUpdatable):
     :math:`\left(k_x, k_y\right)` by
 
     .. math ::
-        \left(\varphi_x, \varphi_y\right) = \lambda \left(k_x, k_y\right)
+        \left(\varphi_x, \varphi_y\right) =
+        \left(\lambda k_x, \lambda k_y\right)
         :label: varphi_to_k
 
     where :math:`\lambda` is the beam electron's wavelength. This set of CBED
