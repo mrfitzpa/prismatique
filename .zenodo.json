@@ -14,7 +14,7 @@
 	    "orcid": "0000-0001-6874-9729"
         }
     ],
-    "description": "<p>`prismatique` is a wrapper to the Python library `pyprismatic`, which is a library for simulating CBED, STEM, and HRTEM experiments using Multislice algorithms.</p><p>This work was part-funded by the Natural Sciences and Engineering Research Council of Canada (NSERC), from Collaborative Research and Development grant (CRDPJ 543431), partnering with Hitachi High-Tech Canada.</p>",
+    "description": "<p><code>prismatique</code> is a wrapper to the Python library <code>pyprismatic</code>, which is a library for simulating CBED, STEM, and HRTEM experiments using Multislice algorithms.</p><p>This work was part-funded by the Natural Sciences and Engineering Research Council of Canada (NSERC), from Collaborative Research and Development grant (CRDPJ 543431), partnering with Hitachi High-Tech Canada.</p>",
     "keywords": [
 	"hyperspy",
 	"multislice",
@@ -40,7 +40,7 @@
     "communities": [
         {"identifier": "tem"},
 	{"identifier": "4d-stem"}
-    ]
+    ],
     "related_identifiers": [
     {
       "scheme": "doi",
