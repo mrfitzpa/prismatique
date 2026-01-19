@@ -6,6 +6,7 @@
 [![PyPi Version](https://img.shields.io/pypi/v/prismatique.svg)](https://pypi.org/project/prismatique)
 [![Conda-Forge Version](https://img.shields.io/conda/vn/conda-forge/prismatique.svg)](https://anaconda.org/conda-forge/prismatique)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.18296081-blue.svg)](https://doi.org/10.5281/zenodo.18296081)
 
 `prismatique` is a Python library that functions essentially as a wrapper to the
 Python library `pyprismatic`, which itself is a thin wrapper to `prismatic`, a
