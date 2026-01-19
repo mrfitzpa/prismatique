@@ -31,6 +31,10 @@ keywords:
 license: GPL-3.0
 version: 0.0.4
 date-released: '2026-01-18'
+identifiers:
+  - description: "This is the collection of archived snapshots of all versions."
+    type: doi
+    value: 10.5281/zenodo.18296081
 references:
   - type: article
     authors:
